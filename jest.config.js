@@ -1,27 +1,29 @@
-module.exports = {
-  testMatch: [
-    "**/test/**/*.+(ts|tsx|js)",
-    "**/src/**/(*.)+(spec|test).+(ts|tsx|js)",
-  ],
-  transform: {
-    "^.+\\.(ts|tsx)$": "ts-jest",
-  },
-  //   testPathIgnorePatterns: ["./examples"],
-  testEnvironment: "miniflare",
-  testEnvironmentOptions: {
-    /*
-      bindings: {
-        __STATIC_CONTENT: {
-          get: (key) => {
-            const table = { 'index.abcdef.index': 'This is index' }
-            return table[key]
-          },
-        },
-        __STATIC_CONTENT_MANIFEST: JSON.stringify({
-          'index.index': 'index.abcdef.index',
-        }),
-      },
-      kvNamespaces: ['TEST_NAMESPACE'],
-    */
-  },
+const { resolve } = require("path");
+const { pathsToModuleNameMapper } = require("ts-jest");
+
+const pkg = require("./package.json");
+const tsconfig = require("./tsconfig.json");
+const CI = !!process.env.CI;
+
+module.exports = () => {
+  return {
+    displayName: pkg.name,
+    rootDir: __dirname,
+    preset: "ts-jest",
+    testEnvironment: "miniflare",
+    restoreMocks: true,
+    reporters: ["default"],
+    modulePathIgnorePatterns: ["dist"],
+    moduleNameMapper: pathsToModuleNameMapper(
+      tsconfig.compilerOptions.paths || [],
+      {
+        prefix: `./`,
+      }
+    ),
+    cacheDirectory: resolve(
+      __dirname,
+      `${CI ? "" : "node_modules/"}.cache/jest`
+    ),
+    collectCoverage: false,
+  };
 };
