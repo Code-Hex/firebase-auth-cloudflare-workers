@@ -1,5 +1,6 @@
-import { decodeBase64UrlBytes } from "./base64";
+import { decodeBase64Url } from "./base64";
 import { JwtError, JwtErrorCode } from "./errors";
+import { utf8Decoder, utf8Encoder } from "./utf8";
 import { isNonEmptyString, isNumber, isString } from "./validator";
 
 export interface TokenDecoder {
@@ -10,7 +11,7 @@ export interface JsonWebKeyWithKid extends JsonWebKey {
   kid: string;
 }
 
-type DecodedHeader = { kid: string; alg: "RS256" } & Record<string, any>;
+export type DecodedHeader = { kid: string; alg: "RS256" } & Record<string, any>;
 
 export type DecodedPayload = {
   aud: string;
@@ -52,7 +53,7 @@ export class RS256Token {
     return new RS256Token(token, {
       header,
       payload,
-      signature: decodeBase64UrlBytes(tokenParts[2]),
+      signature: decodeBase64Url(tokenParts[2]),
     });
   }
 
@@ -61,7 +62,7 @@ export class RS256Token {
 
     // `${token.header}.${token.payload}`
     const trimmedSignature = rawToken.substring(0, rawToken.lastIndexOf("."));
-    return new TextEncoder().encode(trimmedSignature);
+    return utf8Encoder.encode(trimmedSignature);
   }
 }
 
@@ -93,42 +94,42 @@ const decodePayload = (
   if (!isNonEmptyString(payload.aud)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"aud" claim must be a string but got ${payload.aud}}`
+      `"aud" claim must be a string but got "${payload.aud}"`
     );
   }
 
   if (!isNonEmptyString(payload.sub)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"sub" claim must be a string but got ${payload.sub}}`
+      `"sub" claim must be a string but got "${payload.sub}}"`
     );
   }
 
   if (!isNonEmptyString(payload.iss)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"iss" claim must be a string but got ${payload.iss}}`
+      `"iss" claim must be a string but got "${payload.iss}}"`
     );
   }
 
   if (!isNumber(payload.iat)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"iat" claim must be a number but got ${payload.iat}}`
+      `"iat" claim must be a number but got "${payload.iat}}"`
     );
   }
 
   if (currentTimestamp < payload.iat) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `Incorrect "iat" claim must be a newer than "${currentTimestamp}" (iat: ${payload.iat})`
+      `Incorrect "iat" claim must be a newer than "${currentTimestamp}" (iat: "${payload.iat}")`
     );
   }
 
   if (!isNumber(payload.exp)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"exp" claim must be a number but got ${payload.exp}}`
+      `"exp" claim must be a number but got "${payload.exp}"}`
     );
   }
 
@@ -143,21 +144,9 @@ const decodePayload = (
 };
 
 const decodeBase64JSON = (b64Url: string): any => {
-  let b64 = b64Url.replace(/-/g, "+").replace(/_/g, "/");
-  switch (b64.length % 4) {
-    case 0:
-      break;
-    case 2:
-      b64 += "==";
-      break;
-    case 3:
-      b64 += "=";
-      break;
-    default:
-      throw new Error("Illegal base64url string.");
-  }
+  const decoded = decodeBase64Url(b64Url)
   try {
-    return JSON.parse(decodeURIComponent(atob(b64)));
+    return JSON.parse(utf8Decoder.decode(decoded));
   } catch {
     return null;
   }

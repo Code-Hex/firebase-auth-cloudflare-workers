@@ -1,4 +1,4 @@
-import { isArray, isNonEmptyString, isNonNullObject, isNumber, isObject, isString, isURL } from "./validator"
+import { isArray, isNonEmptyString, isNonNullObject, isNumber, isObject, isString, isURL } from "../src/validator"
 
 describe("validator", () => {
   describe("isURL", () => {

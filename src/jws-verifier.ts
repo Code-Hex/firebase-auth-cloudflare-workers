@@ -4,7 +4,13 @@ import { JsonWebKeyWithKid, RS256Token } from "./jwt-decoder";
 import { isNonNullObject } from "./validator";
 
 // https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library
-const rs256alg = { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" };
+// https://developer.mozilla.org/en-US/docs/Web/API/RsaHashedKeyGenParams
+export const rs256alg: RsaHashedKeyGenParams = {
+  name: "RSASSA-PKCS1-v1_5",
+  modulusLength: 2048,
+  publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
+  hash: "SHA-256",
+};
 
 export interface SignatureVerifier {
   verify(token: RS256Token): Promise<void>;
@@ -44,7 +50,8 @@ export class PublicKeySignatureVerifier implements SignatureVerifier {
       if (publicKey.kid !== header.kid) {
         continue;
       }
-      if (await this.verifySignature(token, publicKey)) {
+      const verified = await this.verifySignature(token, publicKey)
+      if (verified) {
         // succeeded
         return;
       }
