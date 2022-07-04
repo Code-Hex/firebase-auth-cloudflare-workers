@@ -101,42 +101,42 @@ const decodePayload = (
   if (!isNonEmptyString(payload.sub)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"sub" claim must be a string but got "${payload.sub}}"`
+      `"sub" claim must be a string but got "${payload.sub}"`
     );
   }
 
   if (!isNonEmptyString(payload.iss)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"iss" claim must be a string but got "${payload.iss}}"`
+      `"iss" claim must be a string but got "${payload.iss}"`
     );
   }
 
   if (!isNumber(payload.iat)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"iat" claim must be a number but got "${payload.iat}}"`
+      `"iat" claim must be a number but got "${payload.iat}"`
     );
   }
 
-  if (currentTimestamp < payload.iat) {
+  if (currentTimestamp <= payload.iat) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `Incorrect "iat" claim must be a newer than "${currentTimestamp}" (iat: "${payload.iat}")`
+      `Incorrect "iat" claim must be a older than "${currentTimestamp}" (iat: "${payload.iat}")`
     );
   }
 
   if (!isNumber(payload.exp)) {
     throw new JwtError(
       JwtErrorCode.INVALID_ARGUMENT,
-      `"exp" claim must be a number but got "${payload.exp}"}`
+      `"exp" claim must be a number but got "${payload.exp}"`
     );
   }
 
-  if (currentTimestamp >= payload.exp) {
+  if (currentTimestamp > payload.exp) {
     throw new JwtError(
       JwtErrorCode.TOKEN_EXPIRED,
-      `Incorrect "exp" (expiration time) claim must be a older than "${currentTimestamp}" (exp: ${payload.exp})`
+      `Incorrect "exp" (expiration time) claim must be a newer than "${currentTimestamp}" (exp: "${payload.exp}")`
     );
   }
 

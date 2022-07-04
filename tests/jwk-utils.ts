@@ -23,8 +23,10 @@ export class TestingKeyFetcher implements KeyFetcher {
   }
 }
 
-export const genIat = (ms: number = Date.now()): number => Math.floor(ms / 1000)
+export const genTime = (ms: number = Date.now()): number => Math.floor(ms / 1000)
 export const genIss = (projectId: string = "projectId1234"): string => "https://securetoken.google.com/" + projectId
+
+export const encodeObjectBase64Url = (obj: any): string => encodeBase64Url(jsonUTF8Stringify(obj))
 
 const jsonUTF8Stringify = (obj: any): Uint8Array => utf8Encoder.encode(JSON.stringify(obj))
 
@@ -34,8 +36,8 @@ export const signJWT = async (kid: string, payload: DecodedPayload, privateKey: 
     typ: 'JWT',
     kid,
   };
-  const encodedHeader = encodeBase64Url(jsonUTF8Stringify(header)).replace(/=/g, "")
-  const encodedPayload = encodeBase64Url(jsonUTF8Stringify(payload)).replace(/=/g, "")
+  const encodedHeader = encodeObjectBase64Url(header).replace(/=/g, "")
+  const encodedPayload = encodeObjectBase64Url(payload).replace(/=/g, "")
   const headerAndPayload = `${encodedHeader}.${encodedPayload}`;
 
   const signature = await crypto.subtle.sign(

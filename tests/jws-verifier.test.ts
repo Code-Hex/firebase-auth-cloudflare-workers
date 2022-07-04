@@ -1,16 +1,16 @@
 import { JwtError, JwtErrorCode } from "../src/errors"
 import { PublicKeySignatureVerifier, rs256alg } from "../src/jws-verifier"
 import { DecodedPayload, RS256Token } from "../src/jwt-decoder"
-import { genIat, genIss, signJWT, TestingKeyFetcher } from "./jwk-utils"
+import { genTime, genIss, signJWT, TestingKeyFetcher } from "./jwk-utils"
 
 describe("PublicKeySignatureVerifier", () => {
   const kid = "kid123456"
   const projectId = "projectId1234"
-  const currentTimestamp = Date.now()
+  const currentTimestamp = genTime(Date.now())
   const payload: DecodedPayload = {
     aud: projectId,
     exp: currentTimestamp + 9999,
-    iat: genIat(currentTimestamp - 10000), // -10s
+    iat: currentTimestamp - 10000, // -10s
     iss: genIss(projectId),
     sub: "userId12345",
   }
