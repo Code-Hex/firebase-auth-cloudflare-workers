@@ -16,8 +16,10 @@ export const encodeBase64 = (buf: ArrayBufferLike): string => {
 const decodeBase64 = (str: string): Uint8Array => {
   const binary = atob(str)
   const bytes = new Uint8Array(new ArrayBuffer(binary.length));
-  for (let i = 0; i < binary.length ; i++) {
+  const half = binary.length / 2;
+  for (let i = 0, j = binary.length - 1; i <= half; i++, j--) {
     bytes[i] = binary.charCodeAt(i);
+    bytes[j] = binary.charCodeAt(j);
   }
   return bytes
 }
