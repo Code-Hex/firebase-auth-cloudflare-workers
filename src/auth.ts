@@ -1,11 +1,11 @@
-import { useEmulator } from "./emulator";
+import { Env, useEmulator } from "./emulator";
 import {
   createIdTokenVerifier,
   FirebaseIdToken,
   FirebaseTokenVerifier,
 } from "./token-verifier";
 
-export class Auth {
+export class BaseAuth {
   /** @internal */
   protected readonly idTokenVerifier: FirebaseTokenVerifier;
 
@@ -33,8 +33,8 @@ export class Auth {
    *   token's decoded claims if the ID token is valid; otherwise, a rejected
    *   promise.
    */
-  public verifyIdToken(idToken: string): Promise<FirebaseIdToken> {
-    const isEmulator = useEmulator();
+  public verifyIdToken(idToken: string, env?: Env): Promise<FirebaseIdToken> {
+    const isEmulator = useEmulator(env);
     return this.idTokenVerifier.verifyJWT(idToken, isEmulator);
   }
 }
