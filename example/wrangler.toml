@@ -1,0 +1,31 @@
+name = "firebase-auth-example"
+compatibility_date = "2022-07-05"
+workers_dev = true
+
+[vars]
+# Please set FIREBASE_AUTH_EMULATOR_HOST environment variable in your wrangler.toml.
+# see: https://developers.cloudflare.com/workers/platform/environment-variables/#environment-variables-via-wrangler
+#
+# Example for wrangler.toml
+# [vars]
+# FIREBASE_AUTH_EMULATOR_HOST = "localhost:8080"
+#
+# Override values for `--env production` usage
+# [env.production.vars]
+# FIREBASE_AUTH_EMULATOR_HOST = ""
+FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099"
+
+# Setup user account in Emulator UI
+EMAIL_ADDRESS = "test@example.com"
+PASSWORD = "test1234"
+
+PROJECT_ID = "example-project12345" # see package.json (for emulator)
+
+# Specify cache key to store and get public jwk.
+PUBLIC_JWK_CACHE_KEY = "public-jwk-cache-key"
+
+kv_namespaces = [
+  { binding = "PUBLIC_JWK_CACHE_KV", id = "", preview_id = "" }
+]
+
+tsconfig = "./tsconfig.json"
