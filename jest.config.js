@@ -2,15 +2,23 @@ const { resolve } = require("path");
 const { pathsToModuleNameMapper } = require("ts-jest");
 
 const pkg = require("./package.json");
-const tsconfig = require("./tsconfig.json");
+const tsconfig = require("./tests/tsconfig.json");
 const CI = !!process.env.CI;
 
 module.exports = () => {
   return {
+    preset: "ts-jest/presets/default-esm",
+    globals: {
+      "ts-jest": {
+        tsconfig: "./tests/tsconfig.json",
+      },
+    },
     displayName: pkg.name,
     rootDir: __dirname,
-    preset: "ts-jest",
     testEnvironment: "miniflare",
+    testEnvironmentOptions: {
+      kvNamespaces: ["TEST_NAMESPACE"],
+    },
     restoreMocks: true,
     reporters: ["default"],
     modulePathIgnorePatterns: ["dist"],

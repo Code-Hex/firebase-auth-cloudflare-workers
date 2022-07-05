@@ -1,5 +1,5 @@
 import { JwtError, JwtErrorCode } from "./errors";
-import { KeyFetcher, UrlKeyFetcher } from "./jwk-fetcher";
+import { HTTPFetcher, KeyFetcher, UrlKeyFetcher } from "./jwk-fetcher";
 import { JsonWebKeyWithKid, RS256Token } from "./jwt-decoder";
 import { isNonNullObject } from "./validator";
 
@@ -30,8 +30,9 @@ export class PublicKeySignatureVerifier implements SignatureVerifier {
     clientCertUrl: string,
     cfKVNamespace: KVNamespace
   ): PublicKeySignatureVerifier {
+    const fetcher = new HTTPFetcher(clientCertUrl)
     return new PublicKeySignatureVerifier(
-      new UrlKeyFetcher(clientCertUrl, cfKVNamespace)
+      new UrlKeyFetcher(fetcher, cfKVNamespace)
     );
   }
 
