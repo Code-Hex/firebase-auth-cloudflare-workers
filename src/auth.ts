@@ -1,3 +1,4 @@
+import { useEmulator } from "./emulator";
 import {
   createIdTokenVerifier,
   FirebaseIdToken,
@@ -8,9 +9,14 @@ export class Auth {
   /** @internal */
   protected readonly idTokenVerifier: FirebaseTokenVerifier;
 
-  constructor(projectId: string, cfPublicKeyCacheNamespace: KVNamespace) {
+  constructor(
+    projectId: string,
+    cacheKey: string,
+    cfPublicKeyCacheNamespace: KVNamespace
+  ) {
     this.idTokenVerifier = createIdTokenVerifier(
       projectId,
+      cacheKey,
       cfPublicKeyCacheNamespace
     );
   }
@@ -27,10 +33,8 @@ export class Auth {
    *   token's decoded claims if the ID token is valid; otherwise, a rejected
    *   promise.
    */
-  public verifyIdToken(
-    idToken: string,
-    isEmulator = false
-  ): Promise<FirebaseIdToken> {
+  public verifyIdToken(idToken: string): Promise<FirebaseIdToken> {
+    const isEmulator = useEmulator();
     return this.idTokenVerifier.verifyJWT(idToken, isEmulator);
   }
 }

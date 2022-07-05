@@ -28,11 +28,12 @@ export class PublicKeySignatureVerifier implements SignatureVerifier {
 
   public static withCertificateUrl(
     clientCertUrl: string,
+    cacheKey: string,
     cfKVNamespace: KVNamespace
   ): PublicKeySignatureVerifier {
     const fetcher = new HTTPFetcher(clientCertUrl)
     return new PublicKeySignatureVerifier(
-      new UrlKeyFetcher(fetcher, cfKVNamespace)
+      new UrlKeyFetcher(fetcher, cacheKey, cfKVNamespace)
     );
   }
 
@@ -102,5 +103,14 @@ export class PublicKeySignatureVerifier implements SignatureVerifier {
         `Error fetching public keys for Google certs: ${err}`
       );
     }
+  }
+}
+
+/**
+ * Class for verifying unsigned (emulator) JWTs.
+ */
+ export class EmulatorSignatureVerifier implements SignatureVerifier {
+  public async verify(_token: RS256Token): Promise<void> {
+    // Signature checks skipped for emulator; no need to fetch public keys.
   }
 }

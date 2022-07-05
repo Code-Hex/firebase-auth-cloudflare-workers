@@ -36,10 +36,11 @@ export class RS256Token {
    *
    * @param token - The JWT to verify.
    * @param currentTimestamp - Current timestamp in seconds since the Unix epoch.
+   * @param skipVerifyHeader - skip verification header content if true.
    * @throw Error if the token is invalid.
    * @returns
    */
-  public static decode(token: string, currentTimestamp: number): RS256Token {
+  public static decode(token: string, currentTimestamp: number, skipVerifyHeader: boolean = false): RS256Token {
     const tokenParts = token.split(".");
     if (tokenParts.length !== 3) {
       throw new JwtError(
@@ -47,7 +48,7 @@ export class RS256Token {
         "token must consist of 3 parts"
       );
     }
-    const header = decodeHeader(tokenParts[0]);
+    const header = decodeHeader(tokenParts[0], skipVerifyHeader);
     const payload = decodePayload(tokenParts[1], currentTimestamp);
 
     return new RS256Token(token, {
@@ -66,8 +67,11 @@ export class RS256Token {
   }
 }
 
-const decodeHeader = (headerPart: string): DecodedHeader => {
+const decodeHeader = (headerPart: string, skipVerifyHeader: boolean): DecodedHeader => {
   const header = decodeBase64JSON(headerPart);
+  if (skipVerifyHeader) {
+    return header
+  }
   const kid = header.kid;
   if (!isString(kid)) {
     throw new JwtError(
