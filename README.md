@@ -93,6 +93,14 @@ addEventListener('fetch', (event: FetchEvent) => {
 })
 ```
 
+## Install
+
+You can install from npm registry.
+
+```
+$ npm i firebase-auth-cloudflare-workers
+```
+
 ## Docs
 
 - [API](#api)
