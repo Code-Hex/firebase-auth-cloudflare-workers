@@ -1,4 +1,4 @@
-import { Auth, emulatorHost, Env } from "../src";
+import { Auth, emulatorHost, Env, WorkersKVStoreSingle } from "../src";
 
 interface Bindings extends Env {
   EMAIL_ADDRESS: string
@@ -39,8 +39,7 @@ export async function handleRequest(req: Request, env: Bindings) {
   const jwt = authorization.replace(/Bearer\s+/i, "")
   const auth = Auth.getOrInitialize(
     env.PROJECT_ID,
-    env.PUBLIC_JWK_CACHE_KEY,
-    env.PUBLIC_JWK_CACHE_KV
+    WorkersKVStoreSingle.getOrInitialize(env.PUBLIC_JWK_CACHE_KEY, env.PUBLIC_JWK_CACHE_KV)
   )
   const firebaseToken = await auth.verifyIdToken(jwt, env)
 
