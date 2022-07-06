@@ -1,6 +1,7 @@
 import { JwtError, JwtErrorCode } from "./errors";
 import { HTTPFetcher, KeyFetcher, UrlKeyFetcher } from "./jwk-fetcher";
 import { JsonWebKeyWithKid, RS256Token } from "./jwt-decoder";
+import { KeyStorer } from "./key-store";
 import { isNonNullObject } from "./validator";
 
 // https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library
@@ -28,12 +29,11 @@ export class PublicKeySignatureVerifier implements SignatureVerifier {
 
   public static withCertificateUrl(
     clientCertUrl: string,
-    cacheKey: string,
-    cfKVNamespace: KVNamespace
+    keyStorer: KeyStorer,
   ): PublicKeySignatureVerifier {
     const fetcher = new HTTPFetcher(clientCertUrl)
     return new PublicKeySignatureVerifier(
-      new UrlKeyFetcher(fetcher, cacheKey, cfKVNamespace)
+      new UrlKeyFetcher(fetcher, keyStorer)
     );
   }
 

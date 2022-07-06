@@ -1,4 +1,5 @@
 import { Env, useEmulator } from "./emulator";
+import { KeyStorer } from "./key-store";
 import {
   createIdTokenVerifier,
   FirebaseIdToken,
@@ -11,13 +12,11 @@ export class BaseAuth {
 
   constructor(
     projectId: string,
-    cacheKey: string,
-    cfPublicKeyCacheNamespace: KVNamespace
+    keyStore: KeyStorer,
   ) {
     this.idTokenVerifier = createIdTokenVerifier(
       projectId,
-      cacheKey,
-      cfPublicKeyCacheNamespace
+      keyStore
     );
   }
 

@@ -1,4 +1,5 @@
 import { Fetcher, parseMaxAge, UrlKeyFetcher } from "../src/jwk-fetcher"
+import { WorkersKVStore } from "../src/key-store";
 
 class HTTPMockFetcher implements Fetcher {
   constructor(private readonly response: Response) { }
@@ -62,8 +63,7 @@ describe("UrlKeyFetcher", () => {
     )
     const urlKeyFetcher = new UrlKeyFetcher(
       mockedFetcher,
-      cacheKey,
-      TEST_NAMESPACE,
+      new WorkersKVStore(cacheKey, TEST_NAMESPACE),
     )
 
     const httpFetcherSpy = jest.spyOn(mockedFetcher, "fetch")
@@ -96,8 +96,7 @@ describe("UrlKeyFetcher", () => {
     )
     const urlKeyFetcher = new UrlKeyFetcher(
       mockedFetcher,
-      cacheKey,
-      TEST_NAMESPACE,
+      new WorkersKVStore(cacheKey, TEST_NAMESPACE),
     )
 
     const httpFetcherSpy = jest.spyOn(mockedFetcher, "fetch")
@@ -123,8 +122,7 @@ describe("UrlKeyFetcher", () => {
     )
     const urlKeyFetcher = new UrlKeyFetcher(
       mockedFetcher,
-      cacheKey,
-      TEST_NAMESPACE,
+      new WorkersKVStore(cacheKey, TEST_NAMESPACE),
     )
 
     expect(() => urlKeyFetcher.fetchPublicKeys()).rejects.toThrowError(
@@ -141,8 +139,7 @@ describe("UrlKeyFetcher", () => {
     )
     const urlKeyFetcher = new UrlKeyFetcher(
       mockedFetcher,
-      cacheKey,
-      TEST_NAMESPACE,
+      new WorkersKVStore(cacheKey, TEST_NAMESPACE),
     )
 
     expect(() => urlKeyFetcher.fetchPublicKeys()).rejects.toThrowError(

@@ -1,4 +1,5 @@
 import { JsonWebKeyWithKid } from "./jwt-decoder";
+import { KeyStorer } from "./key-store";
 import { isArray, isNonNullObject, isURL } from "./validator";
 
 export interface KeyFetcher {
@@ -18,9 +19,8 @@ const isJWKMetadata = (value: any): value is JWKMetadata =>
 export class UrlKeyFetcher implements KeyFetcher {
   constructor(
     private readonly fetcher: Fetcher,
-    private readonly cacheKey: string,
-    private readonly cfKVNamespace: KVNamespace
-  ) {}
+    private readonly keyStorer: KeyStorer,
+  ) { }
 
   /**
    * Fetches the public keys for the Google certs.
@@ -28,10 +28,7 @@ export class UrlKeyFetcher implements KeyFetcher {
    * @returns A promise fulfilled with public keys for the Google certs.
    */
   public async fetchPublicKeys(): Promise<Array<JsonWebKeyWithKid>> {
-    const publicKeys = await this.cfKVNamespace.get<Array<JsonWebKeyWithKid>>(
-      this.cacheKey,
-      "json"
-    );
+    const publicKeys = await this.keyStorer.get<Array<JsonWebKeyWithKid>>();
     if (publicKeys === null || typeof publicKeys !== "object") {
       return await this.refresh();
     }
@@ -58,12 +55,9 @@ export class UrlKeyFetcher implements KeyFetcher {
     // store the public keys cache in the KV store.
     const maxAge = parseMaxAge(cacheControlHeader)
     if (!isNaN(maxAge)) {
-      this.cfKVNamespace.put(
-        this.cacheKey,
+      await this.keyStorer.put(
         JSON.stringify(publicKeys.keys),
-        {
-          expirationTtl: maxAge,
-        }
+        maxAge,
       );
     }
 

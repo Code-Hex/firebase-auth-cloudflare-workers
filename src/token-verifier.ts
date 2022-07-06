@@ -7,6 +7,7 @@ import {
 } from "./errors";
 import { EmulatorSignatureVerifier, PublicKeySignatureVerifier, SignatureVerifier } from "./jws-verifier";
 import { DecodedPayload, RS256Token } from "./jwt-decoder";
+import { KeyStorer } from "./key-store";
 import { isNonEmptyString, isNonNullObject, isString, isURL } from "./validator";
 
 // Audience to use for Firebase Auth Custom tokens
@@ -454,13 +455,11 @@ export const ID_TOKEN_INFO: FirebaseTokenInfo = {
  */
 export function createIdTokenVerifier(
   projectID: string,
-  cacheKey: string,
-  cfPublicKeyCacheNamespace: KVNamespace
+  keyStorer: KeyStorer
 ): FirebaseTokenVerifier {
   const signatureVerifier = PublicKeySignatureVerifier.withCertificateUrl(
     CLIENT_JWK_URL,
-    cacheKey,
-    cfPublicKeyCacheNamespace
+    keyStorer
   );
   return createFirebaseTokenVerifier(signatureVerifier, projectID)
 }
