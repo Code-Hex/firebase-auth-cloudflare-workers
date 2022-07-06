@@ -1,4 +1,4 @@
-import { Env, useEmulator } from "./emulator";
+import { EmulatorEnv, useEmulator } from "./emulator";
 import { KeyStorer } from "./key-store";
 import {
   createIdTokenVerifier,
@@ -32,7 +32,7 @@ export class BaseAuth {
    *   token's decoded claims if the ID token is valid; otherwise, a rejected
    *   promise.
    */
-  public verifyIdToken(idToken: string, env?: Env): Promise<FirebaseIdToken> {
+  public verifyIdToken(idToken: string, env?: EmulatorEnv): Promise<FirebaseIdToken> {
     const isEmulator = useEmulator(env);
     return this.idTokenVerifier.verifyJWT(idToken, isEmulator);
   }

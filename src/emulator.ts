@@ -1,8 +1,8 @@
-export interface Env {
+export interface EmulatorEnv {
   FIREBASE_AUTH_EMULATOR_HOST: string | undefined
 }
 
-export function emulatorHost(env?: Env): string | undefined {
+export function emulatorHost(env?: EmulatorEnv): string | undefined {
   return env?.FIREBASE_AUTH_EMULATOR_HOST;
 }
 
@@ -10,6 +10,6 @@ export function emulatorHost(env?: Env): string | undefined {
  * When true the SDK should communicate with the Auth Emulator for all API
  * calls and also produce unsigned tokens.
  */
-export const useEmulator = (env?: Env): boolean => {
+export const useEmulator = (env?: EmulatorEnv): boolean => {
   return !!emulatorHost(env);
 };

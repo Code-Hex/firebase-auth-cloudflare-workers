@@ -1,6 +1,6 @@
-import { Auth, emulatorHost, Env, WorkersKVStoreSingle } from "../src";
+import { Auth, emulatorHost, EmulatorEnv, WorkersKVStoreSingle } from "../src";
 
-interface Bindings extends Env {
+interface Bindings extends EmulatorEnv {
   EMAIL_ADDRESS: string
   PASSWORD: string
   FIREBASE_AUTH_EMULATOR_HOST: string

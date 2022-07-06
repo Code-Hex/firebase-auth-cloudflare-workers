@@ -6,7 +6,8 @@ export {
   useEmulator
 } from "./emulator"
 export type { KeyStorer }
-export type { Env } from './emulator'
+export type { EmulatorEnv } from './emulator'
+export type { FirebaseIdToken } from './token-verifier'
 
 export class Auth extends BaseAuth {
   private static instance?: Auth;
