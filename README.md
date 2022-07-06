@@ -98,7 +98,7 @@ addEventListener('fetch', (event: FetchEvent) => {
 - [API](#api)
 - [Type](#type)
 - [Run example code](#run-example-code)
-- [Run example code](#todo)
+- [Todo](#todo)
 
 ## API
 
