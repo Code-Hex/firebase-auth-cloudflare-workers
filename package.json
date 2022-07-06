@@ -4,14 +4,26 @@
   "description": "Zero-dependencies firebase auth library for Cloudflare Workers.",
   "author": "codehex",
   "license": "MIT",
+  "main": "dist/main/index.js",
+  "typings": "dist/main/index.d.ts",
+  "module": "dist/module/index.mjs",
+  "files": [
+    "dist/**/*.{js,ts}",
+    "LICENSE",
+    "README.md"
+  ],
   "scripts": {
     "test": "jest",
+    "build": "run-p build:*",
+    "build:main": "tsc -p tsconfig.main.json",
+    "build:module": "tsc -p tsconfig.module.json",
     "start-firebase-emulator": "firebase emulators:start --project example-project12345",
     "start-example": "wrangler dev example/index.ts  --config=example/wrangler.toml --local=true",
     "prettier": "prettier --write --list-different \"**/*.ts\"",
     "prettier:check": "prettier --check \"**/*.ts\"",
     "lint": "eslint --ext .ts .",
-    "lint-fix": "eslint --fix --ext .ts ."
+    "lint-fix": "eslint --fix --ext .ts .",
+    "prepublish": "run-p build:*"
   },
   "dependencies": {},
   "devDependencies": {
@@ -28,6 +40,7 @@
     "firebase-tools": "^11.2.0",
     "jest": "^28.1.2",
     "jest-environment-miniflare": "^2.5.1",
+    "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
     "ts-jest": "^28.0.5",
     "typescript": "^4.7.4",
