@@ -1,5 +1,5 @@
 export interface EmulatorEnv {
-  FIREBASE_AUTH_EMULATOR_HOST: string | undefined
+  FIREBASE_AUTH_EMULATOR_HOST: string | undefined;
 }
 
 export function emulatorHost(env?: EmulatorEnv): string | undefined {
