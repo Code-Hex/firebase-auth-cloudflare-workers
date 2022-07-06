@@ -1,16 +1,17 @@
-import { JwtError, JwtErrorCode } from "./errors";
-import { HTTPFetcher, KeyFetcher, UrlKeyFetcher } from "./jwk-fetcher";
-import { JsonWebKeyWithKid, RS256Token } from "./jwt-decoder";
-import { KeyStorer } from "./key-store";
-import { isNonNullObject } from "./validator";
+import { JwtError, JwtErrorCode } from './errors';
+import type { KeyFetcher } from './jwk-fetcher';
+import { HTTPFetcher, UrlKeyFetcher } from './jwk-fetcher';
+import type { JsonWebKeyWithKid, RS256Token } from './jwt-decoder';
+import type { KeyStorer } from './key-store';
+import { isNonNullObject } from './validator';
 
 // https://firebase.google.com/docs/auth/admin/verify-id-tokens#verify_id_tokens_using_a_third-party_jwt_library
 // https://developer.mozilla.org/en-US/docs/Web/API/RsaHashedKeyGenParams
 export const rs256alg: RsaHashedKeyGenParams = {
-  name: "RSASSA-PKCS1-v1_5",
+  name: 'RSASSA-PKCS1-v1_5',
   modulusLength: 2048,
   publicExponent: new Uint8Array([0x01, 0x00, 0x01]),
-  hash: "SHA-256",
+  hash: 'SHA-256',
 };
 
 export interface SignatureVerifier {
@@ -23,18 +24,13 @@ export interface SignatureVerifier {
 export class PublicKeySignatureVerifier implements SignatureVerifier {
   constructor(private keyFetcher: KeyFetcher) {
     if (!isNonNullObject(keyFetcher)) {
-      throw new Error("The provided key fetcher is not an object or null.");
+      throw new Error('The provided key fetcher is not an object or null.');
     }
   }
 
-  public static withCertificateUrl(
-    clientCertUrl: string,
-    keyStorer: KeyStorer,
-  ): PublicKeySignatureVerifier {
-    const fetcher = new HTTPFetcher(clientCertUrl)
-    return new PublicKeySignatureVerifier(
-      new UrlKeyFetcher(fetcher, keyStorer)
-    );
+  public static withCertificateUrl(clientCertUrl: string, keyStorer: KeyStorer): PublicKeySignatureVerifier {
+    const fetcher = new HTTPFetcher(clientCertUrl);
+    return new PublicKeySignatureVerifier(new UrlKeyFetcher(fetcher, keyStorer));
   }
 
   /**
@@ -52,45 +48,22 @@ export class PublicKeySignatureVerifier implements SignatureVerifier {
       if (publicKey.kid !== header.kid) {
         continue;
       }
-      const verified = await this.verifySignature(token, publicKey)
+      const verified = await this.verifySignature(token, publicKey);
       if (verified) {
         // succeeded
         return;
       }
-      throw new JwtError(
-        JwtErrorCode.INVALID_SIGNATURE,
-        "The token signature is invalid."
-      );
+      throw new JwtError(JwtErrorCode.INVALID_SIGNATURE, 'The token signature is invalid.');
     }
-    throw new JwtError(
-      JwtErrorCode.NO_MATCHING_KID,
-      "The token does not match the kid."
-    );
+    throw new JwtError(JwtErrorCode.NO_MATCHING_KID, 'The token does not match the kid.');
   }
 
-  private async verifySignature(
-    token: RS256Token,
-    publicJWK: JsonWebKeyWithKid
-  ): Promise<boolean> {
+  private async verifySignature(token: RS256Token, publicJWK: JsonWebKeyWithKid): Promise<boolean> {
     try {
-      const key = await crypto.subtle.importKey(
-        "jwk",
-        publicJWK,
-        rs256alg,
-        false,
-        ["verify"]
-      );
-      return await crypto.subtle.verify(
-        rs256alg,
-        key,
-        token.decodedToken.signature,
-        token.getHeaderPayloadBytes()
-      );
+      const key = await crypto.subtle.importKey('jwk', publicJWK, rs256alg, false, ['verify']);
+      return await crypto.subtle.verify(rs256alg, key, token.decodedToken.signature, token.getHeaderPayloadBytes());
     } catch (err) {
-      throw new JwtError(
-        JwtErrorCode.INVALID_SIGNATURE,
-        `Error verifying signature: ${err}`
-      );
+      throw new JwtError(JwtErrorCode.INVALID_SIGNATURE, `Error verifying signature: ${err}`);
     }
   }
 
@@ -98,10 +71,7 @@ export class PublicKeySignatureVerifier implements SignatureVerifier {
     try {
       return await this.keyFetcher.fetchPublicKeys();
     } catch (err) {
-      throw new JwtError(
-        JwtErrorCode.KEY_FETCH_ERROR,
-        `Error fetching public keys for Google certs: ${err}`
-      );
+      throw new JwtError(JwtErrorCode.KEY_FETCH_ERROR, `Error fetching public keys for Google certs: ${err}`);
     }
   }
 }
@@ -109,8 +79,8 @@ export class PublicKeySignatureVerifier implements SignatureVerifier {
 /**
  * Class for verifying unsigned (emulator) JWTs.
  */
- export class EmulatorSignatureVerifier implements SignatureVerifier {
-  public async verify(_token: RS256Token): Promise<void> {
+export class EmulatorSignatureVerifier implements SignatureVerifier {
+  public async verify(): Promise<void> {
     // Signature checks skipped for emulator; no need to fetch public keys.
   }
 }

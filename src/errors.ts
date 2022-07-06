@@ -16,20 +16,20 @@ export class JwtError extends Error {
  * JWT error codes.
  */
 export enum JwtErrorCode {
-  INVALID_ARGUMENT = "invalid-argument",
-  INVALID_CREDENTIAL = "invalid-credential",
-  TOKEN_EXPIRED = "token-expired",
-  INVALID_SIGNATURE = "invalid-token",
-  NO_MATCHING_KID = "no-matching-kid-error",
-  NO_KID_IN_HEADER = "no-kid-error",
-  KEY_FETCH_ERROR = "key-fetch-error",
+  INVALID_ARGUMENT = 'invalid-argument',
+  INVALID_CREDENTIAL = 'invalid-credential',
+  TOKEN_EXPIRED = 'token-expired',
+  INVALID_SIGNATURE = 'invalid-token',
+  NO_MATCHING_KID = 'no-matching-kid-error',
+  NO_KID_IN_HEADER = 'no-kid-error',
+  KEY_FETCH_ERROR = 'key-fetch-error',
 }
 
 /**
  * App client error codes and their default messages.
  */
 export class AppErrorCodes {
-  public static INVALID_CREDENTIAL = "invalid-credential";
+  public static INVALID_CREDENTIAL = 'invalid-credential';
 }
 
 /**
@@ -37,33 +37,32 @@ export class AppErrorCodes {
  */
 export class AuthClientErrorCode {
   public static INVALID_ARGUMENT = {
-    code: "argument-error",
-    message: "Invalid argument provided.",
+    code: 'argument-error',
+    message: 'Invalid argument provided.',
   };
   public static INVALID_CREDENTIAL = {
-    code: "invalid-credential",
-    message: "Invalid credential object provided.",
+    code: 'invalid-credential',
+    message: 'Invalid credential object provided.',
   };
   public static ID_TOKEN_EXPIRED = {
-    code: "id-token-expired",
-    message: "The provided Firebase ID token is expired.",
+    code: 'id-token-expired',
+    message: 'The provided Firebase ID token is expired.',
   };
   public static ID_TOKEN_REVOKED = {
-    code: "id-token-revoked",
-    message: "The Firebase ID token has been revoked.",
+    code: 'id-token-revoked',
+    message: 'The Firebase ID token has been revoked.',
   };
   public static INTERNAL_ERROR = {
-    code: "internal-error",
-    message: "An internal error has occurred.",
+    code: 'internal-error',
+    message: 'An internal error has occurred.',
   };
   public static USER_NOT_FOUND = {
-    code: "user-not-found",
-    message:
-      "There is no user record corresponding to the provided identifier.",
+    code: 'user-not-found',
+    message: 'There is no user record corresponding to the provided identifier.',
   };
   public static USER_DISABLED = {
-    code: "user-disabled",
-    message: "The user record is disabled.",
+    code: 'user-disabled',
+    message: 'The user record is disabled.',
   };
 }
 
@@ -197,7 +196,7 @@ export class PrefixedFirebaseError extends FirebaseError {
 export class FirebaseAuthError extends PrefixedFirebaseError {
   constructor(info: ErrorInfo, message?: string) {
     // Override default message if custom message provided.
-    super("auth", info.code, message || info.message);
+    super('auth', info.code, message || info.message);
 
     /* tslint:disable:max-line-length */
     // Set the prototype explicitly. See the following link for more details:

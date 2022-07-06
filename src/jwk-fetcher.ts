@@ -1,6 +1,6 @@
-import { JsonWebKeyWithKid } from "./jwt-decoder";
-import { KeyStorer } from "./key-store";
-import { isArray, isNonNullObject, isURL } from "./validator";
+import type { JsonWebKeyWithKid } from './jwt-decoder';
+import type { KeyStorer } from './key-store';
+import { isArray, isNonNullObject, isURL } from './validator';
 
 export interface KeyFetcher {
   fetchPublicKeys(): Promise<Array<JsonWebKeyWithKid>>;
@@ -17,10 +17,7 @@ const isJWKMetadata = (value: any): value is JWKMetadata =>
  * Class to fetch public keys from a client certificates URL.
  */
 export class UrlKeyFetcher implements KeyFetcher {
-  constructor(
-    private readonly fetcher: Fetcher,
-    private readonly keyStorer: KeyStorer,
-  ) { }
+  constructor(private readonly fetcher: Fetcher, private readonly keyStorer: KeyStorer) {}
 
   /**
    * Fetches the public keys for the Google certs.
@@ -29,7 +26,7 @@ export class UrlKeyFetcher implements KeyFetcher {
    */
   public async fetchPublicKeys(): Promise<Array<JsonWebKeyWithKid>> {
     const publicKeys = await this.keyStorer.get<Array<JsonWebKeyWithKid>>();
-    if (publicKeys === null || typeof publicKeys !== "object") {
+    if (publicKeys === null || typeof publicKeys !== 'object') {
       return await this.refresh();
     }
     return publicKeys;
@@ -38,27 +35,22 @@ export class UrlKeyFetcher implements KeyFetcher {
   private async refresh(): Promise<Array<JsonWebKeyWithKid>> {
     const resp = await this.fetcher.fetch();
     if (!resp.ok) {
-      let errorMessage = "Error fetching public keys for Google certs: ";
+      const errorMessage = 'Error fetching public keys for Google certs: ';
       const text = await resp.text();
       throw new Error(errorMessage + text);
     }
 
     const publicKeys = await resp.json();
     if (!isJWKMetadata(publicKeys)) {
-      throw new Error(
-        `The public keys are not an object or null: "${publicKeys}`
-      );
+      throw new Error(`The public keys are not an object or null: "${publicKeys}`);
     }
 
-    const cacheControlHeader = resp.headers.get("cache-control");
+    const cacheControlHeader = resp.headers.get('cache-control');
 
     // store the public keys cache in the KV store.
-    const maxAge = parseMaxAge(cacheControlHeader)
+    const maxAge = parseMaxAge(cacheControlHeader);
     if (!isNaN(maxAge)) {
-      await this.keyStorer.put(
-        JSON.stringify(publicKeys.keys),
-        maxAge,
-      );
+      await this.keyStorer.put(JSON.stringify(publicKeys.keys), maxAge);
     }
 
     return publicKeys.keys;
@@ -69,35 +61,31 @@ export class UrlKeyFetcher implements KeyFetcher {
 // returns NaN when Cache-Control header is none or max-age is not found, the value is invalid.
 export const parseMaxAge = (cacheControlHeader: string | null): number => {
   if (cacheControlHeader === null) {
-    return NaN
+    return NaN;
   }
-  const parts = cacheControlHeader.split(",");
+  const parts = cacheControlHeader.split(',');
   for (const part of parts) {
-    const subParts = part.trim().split("=");
-    if (subParts[0] !== "max-age") {
+    const subParts = part.trim().split('=');
+    if (subParts[0] !== 'max-age') {
       continue;
     }
     return Number(subParts[1]); // maxAge is a seconds value.
   }
-  return NaN
-}
+  return NaN;
+};
 
 export interface Fetcher {
-  fetch(): Promise<Response>
+  fetch(): Promise<Response>;
 }
 
 export class HTTPFetcher implements Fetcher {
-  constructor(
-    private readonly clientCertUrl: string,
-  ) {
+  constructor(private readonly clientCertUrl: string) {
     if (!isURL(clientCertUrl)) {
-      throw new Error(
-        "The provided public client certificate URL is not a valid URL."
-      );
+      throw new Error('The provided public client certificate URL is not a valid URL.');
     }
   }
 
   public fetch(): Promise<Response> {
-    return fetch(this.clientCertUrl)
+    return fetch(this.clientCertUrl);
   }
 }
