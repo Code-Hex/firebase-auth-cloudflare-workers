@@ -1,0 +1,6 @@
+node_modules
+dist
+.npmignore
+package-lock.json
+.DS_Store
+tsconfig.tsbuildinfo
