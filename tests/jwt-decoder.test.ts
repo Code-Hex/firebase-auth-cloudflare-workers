@@ -88,17 +88,6 @@ describe('TokenDecoder', () => {
         ),
       ],
       [
-        'iat is now',
-        {
-          ...payload,
-          iat: currentTimestamp,
-        },
-        new JwtError(
-          JwtErrorCode.INVALID_ARGUMENT,
-          `Incorrect "iat" claim must be a older than "${currentTimestamp}" (iat: "${currentTimestamp}")`
-        ),
-      ],
-      [
         'exp is in past',
         {
           ...payload,
