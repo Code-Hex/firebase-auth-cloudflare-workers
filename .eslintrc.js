@@ -17,7 +17,7 @@ module.exports = defineConfig({
   },
   rules: {
     quotes: ['error', 'single'],
-    semi: ['error', 'never'],
+    semi: 'off',
     'no-debugger': ['error'],
     'no-empty': ['warn', { allowEmptyCatch: true }],
     'no-process-exit': 'off',

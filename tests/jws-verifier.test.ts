@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { JwtError, JwtErrorCode } from '../src/errors';
 import { PublicKeySignatureVerifier, rs256alg } from '../src/jws-verifier';
 import type { DecodedPayload } from '../src/jwt-decoder';

@@ -28,7 +28,10 @@ export type DecodedToken = {
 };
 
 export class RS256Token {
-  constructor(private rawToken: string, public readonly decodedToken: DecodedToken) {}
+  constructor(
+    private rawToken: string,
+    public readonly decodedToken: DecodedToken
+  ) {}
   /**
    *
    * @param token - The JWT to verify.

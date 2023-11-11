@@ -7,7 +7,10 @@ export interface KeyStorer {
  * Class to get or store fetched public keys from a client certificates URL.
  */
 export class WorkersKVStore implements KeyStorer {
-  constructor(private readonly cacheKey: string, private readonly cfKVNamespace: KVNamespace) {}
+  constructor(
+    private readonly cacheKey: string,
+    private readonly cfKVNamespace: KVNamespace
+  ) {}
 
   public async get<ExpectedValue = unknown>(): Promise<ExpectedValue | null> {
     return await this.cfKVNamespace.get<ExpectedValue>(this.cacheKey, 'json');

@@ -15,7 +15,7 @@
     "noUnusedParameters": true,
     "types": [
       "@cloudflare/workers-types"
-    ]
+    ],
   },
   "include": [
     "src/**/*.ts"

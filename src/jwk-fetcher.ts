@@ -17,7 +17,10 @@ const isJWKMetadata = (value: any): value is JWKMetadata =>
  * Class to fetch public keys from a client certificates URL.
  */
 export class UrlKeyFetcher implements KeyFetcher {
-  constructor(private readonly fetcher: Fetcher, private readonly keyStorer: KeyStorer) {}
+  constructor(
+    private readonly fetcher: Fetcher,
+    private readonly keyStorer: KeyStorer
+  ) {}
 
   /**
    * Fetches the public keys for the Google certs.

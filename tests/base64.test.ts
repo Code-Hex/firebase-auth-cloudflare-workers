@@ -1,7 +1,8 @@
+import { describe, it, expect } from 'vitest';
 import { decodeBase64Url, encodeBase64Url } from '../src/base64';
 import { utf8Encoder } from '../src/utf8';
 
-const urlRef = (s: string): string => s.replace(/\+|\//g, m => ({ '+': '-', '/': '_' }[m] ?? m));
+const urlRef = (s: string): string => s.replace(/\+|\//g, m => ({ '+': '-', '/': '_' })[m] ?? m);
 
 const str2UInt8Array = (s: string): Uint8Array => {
   const buffer = new Uint8Array(new ArrayBuffer(s.length));

@@ -5,7 +5,10 @@ import type { DecodedHeader, DecodedPayload, JsonWebKeyWithKid } from '../src/jw
 import { utf8Encoder } from '../src/utf8';
 
 export class TestingKeyFetcher implements KeyFetcher {
-  constructor(public readonly kid: string, private readonly keyPair: CryptoKeyPair) {}
+  constructor(
+    public readonly kid: string,
+    private readonly keyPair: CryptoKeyPair
+  ) {}
 
   public static async withKeyPairGeneration(kid: string): Promise<TestingKeyFetcher> {
     const keyPair = await crypto.subtle.generateKey(rs256alg, true, ['sign', 'verify']);

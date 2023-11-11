@@ -6,7 +6,10 @@
  * @constructor
  */
 export class JwtError extends Error {
-  constructor(readonly code: JwtErrorCode, readonly message: string) {
+  constructor(
+    readonly code: JwtErrorCode,
+    readonly message: string
+  ) {
     super(message);
     (this as any).__proto__ = JwtError.prototype;
   }
@@ -160,7 +163,11 @@ export interface ErrorInfo {
  * @constructor
  */
 export class PrefixedFirebaseError extends FirebaseError {
-  constructor(private codePrefix: string, code: string, message: string) {
+  constructor(
+    private codePrefix: string,
+    code: string,
+    message: string
+  ) {
     super({
       code: `${codePrefix}/${code}`,
       message,
