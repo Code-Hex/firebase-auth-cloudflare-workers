@@ -3,7 +3,7 @@ export interface EmulatorEnv {
 }
 
 export function emulatorHost(env?: EmulatorEnv): string | undefined {
-  return env?.FIREBASE_AUTH_EMULATOR_HOST
+  return env?.FIREBASE_AUTH_EMULATOR_HOST;
 }
 
 /**
@@ -11,5 +11,5 @@ export function emulatorHost(env?: EmulatorEnv): string | undefined {
  * calls and also produce unsigned tokens.
  */
 export const useEmulator = (env?: EmulatorEnv): boolean => {
-  return !!emulatorHost(env)
-}
+  return !!emulatorHost(env);
+};

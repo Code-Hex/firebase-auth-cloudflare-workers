@@ -1,16 +1,16 @@
-import { describe, it, expect } from 'vitest'
-import { decodeBase64Url, encodeBase64Url } from '../src/base64'
-import { utf8Encoder } from '../src/utf8'
+import { describe, it, expect } from 'vitest';
+import { decodeBase64Url, encodeBase64Url } from '../src/base64';
+import { utf8Encoder } from '../src/utf8';
 
-const urlRef = (s: string): string => s.replace(/\+|\//g, m => ({ '+': '-', '/': '_' })[m] ?? m)
+const urlRef = (s: string): string => s.replace(/\+|\//g, m => ({ '+': '-', '/': '_' })[m] ?? m);
 
 const str2UInt8Array = (s: string): Uint8Array => {
-  const buffer = new Uint8Array(new ArrayBuffer(s.length))
+  const buffer = new Uint8Array(new ArrayBuffer(s.length));
   for (let i = 0; i < buffer.byteLength; i++) {
-    buffer[i] = s.charCodeAt(i)
+    buffer[i] = s.charCodeAt(i);
   }
-  return buffer
-}
+  return buffer;
+};
 
 describe('base64', () => {
   describe.each([
@@ -42,14 +42,14 @@ describe('base64', () => {
     [str2UInt8Array('sure.'), 'c3VyZS4='],
   ])('%s, %s', (decoded, encoded) => {
     it('encode', () => {
-      const got = encodeBase64Url(decoded)
-      const want = urlRef(encoded)
-      expect(got).toStrictEqual(want)
-    })
+      const got = encodeBase64Url(decoded);
+      const want = urlRef(encoded);
+      expect(got).toStrictEqual(want);
+    });
     it('decode', () => {
-      const got = decodeBase64Url(urlRef(encoded))
-      const want = decoded
-      expect(got).toStrictEqual(want)
-    })
-  })
-})
+      const got = decodeBase64Url(urlRef(encoded));
+      const want = decoded;
+      expect(got).toStrictEqual(want);
+    });
+  });
+});

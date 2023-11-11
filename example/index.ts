@@ -1,5 +1,5 @@
-import type { EmulatorEnv } from '../src'
-import { Auth, emulatorHost, WorkersKVStoreSingle } from '../src'
+import type { EmulatorEnv } from '../src';
+import { Auth, emulatorHost, WorkersKVStoreSingle } from '../src';
 
 interface Bindings extends EmulatorEnv {
   EMAIL_ADDRESS: string;
@@ -10,13 +10,13 @@ interface Bindings extends EmulatorEnv {
   PUBLIC_JWK_CACHE_KEY: string;
 }
 
-const signInPath = '/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=test1234'
+const signInPath = '/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=test1234';
 
 export async function handleRequest(req: Request, env: Bindings) {
-  const url = new URL(req.url)
-  const firebaseEmuHost = emulatorHost(env)
+  const url = new URL(req.url);
+  const firebaseEmuHost = emulatorHost(env);
   if (url.pathname === '/get-jwt' && !!firebaseEmuHost) {
-    const firebaseEmulatorSignInUrl = 'http://' + firebaseEmuHost + signInPath
+    const firebaseEmulatorSignInUrl = 'http://' + firebaseEmuHost + signInPath;
     const resp = await fetch(firebaseEmulatorSignInUrl, {
       method: 'POST',
       body: JSON.stringify({
@@ -27,28 +27,28 @@ export async function handleRequest(req: Request, env: Bindings) {
       headers: {
         'Content-Type': 'application/json',
       },
-    })
-    return resp
+    });
+    return resp;
   }
 
-  const authorization = req.headers.get('Authorization')
+  const authorization = req.headers.get('Authorization');
   if (authorization === null) {
     return new Response(null, {
       status: 400,
-    })
+    });
   }
-  const jwt = authorization.replace(/Bearer\s+/i, '')
+  const jwt = authorization.replace(/Bearer\s+/i, '');
   const auth = Auth.getOrInitialize(
     env.PROJECT_ID,
     WorkersKVStoreSingle.getOrInitialize(env.PUBLIC_JWK_CACHE_KEY, env.PUBLIC_JWK_CACHE_KV)
-  )
-  const firebaseToken = await auth.verifyIdToken(jwt, env)
+  );
+  const firebaseToken = await auth.verifyIdToken(jwt, env);
 
   return new Response(JSON.stringify(firebaseToken), {
     headers: {
       'Content-Type': 'application/json',
     },
-  })
+  });
 }
 
-export default { fetch: handleRequest }
+export default { fetch: handleRequest };

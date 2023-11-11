@@ -11,7 +11,7 @@ export class JwtError extends Error {
     readonly message: string
   ) {
     super(message);
-    (this as any).__proto__ = JwtError.prototype
+    (this as any).__proto__ = JwtError.prototype;
   }
 }
 
@@ -32,7 +32,7 @@ export enum JwtErrorCode {
  * App client error codes and their default messages.
  */
 export class AppErrorCodes {
-  public static INVALID_CREDENTIAL = 'invalid-credential'
+  public static INVALID_CREDENTIAL = 'invalid-credential';
 }
 
 /**
@@ -42,31 +42,31 @@ export class AuthClientErrorCode {
   public static INVALID_ARGUMENT = {
     code: 'argument-error',
     message: 'Invalid argument provided.',
-  }
+  };
   public static INVALID_CREDENTIAL = {
     code: 'invalid-credential',
     message: 'Invalid credential object provided.',
-  }
+  };
   public static ID_TOKEN_EXPIRED = {
     code: 'id-token-expired',
     message: 'The provided Firebase ID token is expired.',
-  }
+  };
   public static ID_TOKEN_REVOKED = {
     code: 'id-token-revoked',
     message: 'The Firebase ID token has been revoked.',
-  }
+  };
   public static INTERNAL_ERROR = {
     code: 'internal-error',
     message: 'An internal error has occurred.',
-  }
+  };
   public static USER_NOT_FOUND = {
     code: 'user-not-found',
     message: 'There is no user record corresponding to the provided identifier.',
-  }
+  };
   public static USER_DISABLED = {
     code: 'user-disabled',
     message: 'The user record is disabled.',
-  }
+  };
 }
 
 /**
@@ -124,17 +124,17 @@ export class FirebaseError extends Error implements FirebaseErrorInterface {
     // Set the prototype explicitly. See the following link for more details:
     // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     /* tslint:enable:max-line-length */
-    (this as any).__proto__ = FirebaseError.prototype
+    (this as any).__proto__ = FirebaseError.prototype;
   }
 
   /** @returns The error code. */
   public get code(): string {
-    return this.errorInfo.code
+    return this.errorInfo.code;
   }
 
   /** @returns The error message. */
   public get message(): string {
-    return this.errorInfo.message
+    return this.errorInfo.message;
   }
 
   /** @returns The object representation of the error. */
@@ -142,7 +142,7 @@ export class FirebaseError extends Error implements FirebaseErrorInterface {
     return {
       code: this.code,
       message: this.message,
-    }
+    };
   }
 }
 
@@ -177,7 +177,7 @@ export class PrefixedFirebaseError extends FirebaseError {
     // Set the prototype explicitly. See the following link for more details:
     // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     /* tslint:enable:max-line-length */
-    (this as any).__proto__ = PrefixedFirebaseError.prototype
+    (this as any).__proto__ = PrefixedFirebaseError.prototype;
   }
 
   /**
@@ -188,7 +188,7 @@ export class PrefixedFirebaseError extends FirebaseError {
    * @returns True if the code matches, false otherwise.
    */
   public hasCode(code: string): boolean {
-    return `${this.codePrefix}/${code}` === this.code
+    return `${this.codePrefix}/${code}` === this.code;
   }
 }
 
@@ -209,6 +209,6 @@ export class FirebaseAuthError extends PrefixedFirebaseError {
     // Set the prototype explicitly. See the following link for more details:
     // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     /* tslint:enable:max-line-length */
-    (this as any).__proto__ = FirebaseAuthError.prototype
+    (this as any).__proto__ = FirebaseAuthError.prototype;
   }
 }
