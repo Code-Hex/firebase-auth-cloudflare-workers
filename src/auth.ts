@@ -1,15 +1,15 @@
-import type { EmulatorEnv } from './emulator';
-import { useEmulator } from './emulator';
-import type { KeyStorer } from './key-store';
-import type { FirebaseIdToken, FirebaseTokenVerifier } from './token-verifier';
-import { createIdTokenVerifier } from './token-verifier';
+import type { EmulatorEnv } from './emulator'
+import { useEmulator } from './emulator'
+import type { KeyStorer } from './key-store'
+import type { FirebaseIdToken, FirebaseTokenVerifier } from './token-verifier'
+import { createIdTokenVerifier } from './token-verifier'
 
 export class BaseAuth {
   /** @internal */
-  protected readonly idTokenVerifier: FirebaseTokenVerifier;
+  protected readonly idTokenVerifier: FirebaseTokenVerifier
 
   constructor(projectId: string, keyStore: KeyStorer) {
-    this.idTokenVerifier = createIdTokenVerifier(projectId, keyStore);
+    this.idTokenVerifier = createIdTokenVerifier(projectId, keyStore)
   }
 
   /**
@@ -25,7 +25,7 @@ export class BaseAuth {
    *   promise.
    */
   public verifyIdToken(idToken: string, env?: EmulatorEnv): Promise<FirebaseIdToken> {
-    const isEmulator = useEmulator(env);
-    return this.idTokenVerifier.verifyJWT(idToken, isEmulator);
+    const isEmulator = useEmulator(env)
+    return this.idTokenVerifier.verifyJWT(idToken, isEmulator)
   }
 }

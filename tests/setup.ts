@@ -1,4 +1,4 @@
-import crypto from 'node:crypto';
-import { vi } from 'vitest';
+import crypto from 'node:crypto'
+import { vi } from 'vitest'
 
-vi.stubGlobal('crypto', crypto);
+vi.stubGlobal('crypto', crypto)
