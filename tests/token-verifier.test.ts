@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { PublicKeySignatureVerifier, rs256alg } from '../src/jws-verifier';
 import type { FirebaseIdToken } from '../src/token-verifier';
 import { createFirebaseTokenVerifier, FIREBASE_AUDIENCE } from '../src/token-verifier';
@@ -22,7 +23,7 @@ describe('FirebaseTokenVerifier', () => {
     },
   };
 
-  test.each([
+  it.each([
     ['valid without firebase emulator', payload],
     [
       'valid custom token without firebase emulator',
@@ -60,7 +61,7 @@ describe('FirebaseTokenVerifier', () => {
     expect(token).toStrictEqual(payload);
   });
 
-  test.each([
+  it.each([
     [
       'aud',
       {

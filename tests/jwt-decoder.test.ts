@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { JwtError, JwtErrorCode } from '../src/errors';
 import type { DecodedHeader, DecodedPayload } from '../src/jwt-decoder';
 import { RS256Token } from '../src/jwt-decoder';
@@ -51,7 +52,7 @@ describe('TokenDecoder', () => {
   });
 
   describe('payload', () => {
-    test.each([
+    it.each([
       [
         'aud',
         {

@@ -1,3 +1,5 @@
+import { Miniflare } from 'miniflare';
+import { describe, it, expect, vi } from 'vitest';
 import type { Fetcher } from '../src/jwk-fetcher';
 import { parseMaxAge, UrlKeyFetcher } from '../src/jwk-fetcher';
 import { WorkersKVStore } from '../src/key-store';
@@ -10,7 +12,12 @@ class HTTPMockFetcher implements Fetcher {
   }
 }
 
-const { TEST_NAMESPACE } = getMiniflareBindings();
+const nullScript = 'export default { fetch: () => new Response(null, { status: 404 }) };';
+const mf = new Miniflare({
+  modules: true,
+  script: nullScript,
+  kvNamespaces: ['TEST_NAMESPACE'],
+});
 
 const validResponseJSON = `{
   "keys": [
@@ -62,9 +69,10 @@ describe('UrlKeyFetcher', () => {
         },
       })
     );
+    const TEST_NAMESPACE = await mf.getKVNamespace('TEST_NAMESPACE');
     const urlKeyFetcher = new UrlKeyFetcher(mockedFetcher, new WorkersKVStore(cacheKey, TEST_NAMESPACE));
 
-    const httpFetcherSpy = jest.spyOn(mockedFetcher, 'fetch');
+    const httpFetcherSpy = vi.spyOn(mockedFetcher, 'fetch');
 
     // first call (no-cache in KV)
     const firstKeys = await urlKeyFetcher.fetchPublicKeys();
@@ -92,9 +100,10 @@ describe('UrlKeyFetcher', () => {
         headers: {},
       })
     );
+    const TEST_NAMESPACE = await mf.getKVNamespace('TEST_NAMESPACE');
     const urlKeyFetcher = new UrlKeyFetcher(mockedFetcher, new WorkersKVStore(cacheKey, TEST_NAMESPACE));
 
-    const httpFetcherSpy = jest.spyOn(mockedFetcher, 'fetch');
+    const httpFetcherSpy = vi.spyOn(mockedFetcher, 'fetch');
 
     // first call (no-cache in KV)
     const firstKeys = await urlKeyFetcher.fetchPublicKeys();
@@ -107,7 +116,7 @@ describe('UrlKeyFetcher', () => {
     expect(httpFetcherSpy).toBeCalledTimes(2);
   });
 
-  it('internal server error fetch', () => {
+  it('internal server error fetch', async () => {
     const cacheKey = 'failed-fetch-flow-key';
     const internalServerMsg = 'Internal Server Error';
     const mockedFetcher = new HTTPMockFetcher(
@@ -115,6 +124,7 @@ describe('UrlKeyFetcher', () => {
         status: 500,
       })
     );
+    const TEST_NAMESPACE = await mf.getKVNamespace('TEST_NAMESPACE');
     const urlKeyFetcher = new UrlKeyFetcher(mockedFetcher, new WorkersKVStore(cacheKey, TEST_NAMESPACE));
 
     expect(() => urlKeyFetcher.fetchPublicKeys()).rejects.toThrowError(
@@ -122,13 +132,14 @@ describe('UrlKeyFetcher', () => {
     );
   });
 
-  it('ok fetch but got text response', () => {
+  it('ok fetch but got text response', async () => {
     const cacheKey = 'ok-fetch-non-json-flow-key';
     const mockedFetcher = new HTTPMockFetcher(
       new Response('{}', {
         status: 200,
       })
     );
+    const TEST_NAMESPACE = await mf.getKVNamespace('TEST_NAMESPACE');
     const urlKeyFetcher = new UrlKeyFetcher(mockedFetcher, new WorkersKVStore(cacheKey, TEST_NAMESPACE));
 
     expect(() => urlKeyFetcher.fetchPublicKeys()).rejects.toThrowError('The public keys are not an object or null:');
@@ -136,7 +147,7 @@ describe('UrlKeyFetcher', () => {
 });
 
 describe('parseMaxAge', () => {
-  test.each([
+  it.each([
     ['valid simple', 'max-age=604800', 604800],
     ['valid with other directives', 'public, max-age=18793, must-revalidate, no-transform', 18793],
     ['invalid cache-control header is null', null, NaN],

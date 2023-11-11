@@ -1,8 +1,9 @@
+import { describe, it, expect } from 'vitest';
 import { isArray, isNonEmptyString, isNonNullObject, isNumber, isObject, isString, isURL } from '../src/validator';
 
 describe('validator', () => {
   describe('isURL', () => {
-    test.each([
+    it.each([
       ['http://example.com/', true],
       ['http://example.com', true],
       ['https://example.com/', true],

@@ -13,7 +13,7 @@
     "README.md"
   ],
   "scripts": {
-    "test": "jest",
+    "test": "vitest run",
     "build": "run-p build:*",
     "build:main": "tsc -p tsconfig.main.json",
     "build:module": "tsc -p tsconfig.module.json",
@@ -27,8 +27,7 @@
   },
   "dependencies": {},
   "devDependencies": {
-    "@cloudflare/workers-types": "^3.14.0",
-    "@types/jest": "^28.1.3",
+    "@cloudflare/workers-types": "^4.20231025.0",
     "@typescript-eslint/eslint-plugin": "^5.30.5",
     "@typescript-eslint/parser": "^5.30.5",
     "eslint": "^8.19.0",
@@ -38,13 +37,12 @@
     "eslint-plugin-eslint-comments": "^3.2.0",
     "eslint-plugin-import": "^2.26.0",
     "firebase-tools": "^11.2.0",
-    "jest": "^28.1.2",
-    "jest-environment-miniflare": "^2.5.1",
+    "miniflare": "^3.20231025.1",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.7.1",
-    "ts-jest": "^28.0.5",
-    "typescript": "^4.7.4",
-    "wrangler": "^2.0.16"
+    "typescript": "^5.2.2",
+    "vitest": "^0.34.6",
+    "wrangler": "^3.15.0"
   },
   "keywords": [
     "web",

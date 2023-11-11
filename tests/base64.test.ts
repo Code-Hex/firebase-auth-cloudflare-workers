@@ -1,3 +1,4 @@
+import { describe, it, expect } from 'vitest';
 import { decodeBase64Url, encodeBase64Url } from '../src/base64';
 import { utf8Encoder } from '../src/utf8';
 
