@@ -1,6 +1,6 @@
 import type { JsonWebKeyWithKid } from './jwt-decoder';
 import type { KeyStorer } from './key-store';
-import { isArray, isNonNullObject, isURL } from './validator';
+import { isNonNullObject, isObject, isURL } from './validator';
 
 export interface KeyFetcher {
   fetchPublicKeys(): Promise<Array<JsonWebKeyWithKid>>;
@@ -10,8 +10,19 @@ interface JWKMetadata {
   keys: Array<JsonWebKeyWithKid>;
 }
 
-export const isJWKMetadata = (value: any): value is JWKMetadata => 
-  isNonNullObject(value) && !!value.keys && isArray(value.keys);
+export const isJWKMetadata = (value: any): value is JWKMetadata => {
+  if (!isNonNullObject(value) || !value.keys) {
+    return false
+  }
+  const keys = value.keys
+  if (!Array.isArray(keys)) {
+    return false
+  }
+  const filtered = keys.filter((key): key is JsonWebKeyWithKid => 
+    isObject(key) && !!key.kid && typeof key.kid === 'string'
+  )
+  return keys.length === filtered.length
+}
 
 /**
  * Class to fetch public keys from a client certificates URL.

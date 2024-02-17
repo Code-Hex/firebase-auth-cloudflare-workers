@@ -186,10 +186,20 @@ describe('isJWKMetadata', () => {
     expect(isJWKMetadata(invalidJWKMetadata)).toBe(false);
   });
 
-  it('should return false for object with non-array keys property', () => {
-    const invalidJWKMetadata = {
-      keys: 'notArray',
-    };
-    expect(isJWKMetadata(invalidJWKMetadata)).toBe(false);
+  it('returns false if keys is not an array', () => {
+    expect(isJWKMetadata({ keys: {} })).toBe(false);
+    expect(isJWKMetadata({ keys: 'string' })).toBe(false);
+  });
+
+  it('returns false if keys is an array but its elements do not have a kid property', () => {
+    expect(isJWKMetadata({ keys: [{}] })).toBe(false);
+  });
+
+  it('returns false if keys is an array but kid is not a string', () => {
+    expect(isJWKMetadata({ keys: [{ kid: 123 }] })).toBe(false);
+  });
+
+  it('returns false if only some keys have a kid property that is a string', () => {
+    expect(isJWKMetadata({ keys: [{ kid: 'string' }, {}] })).toBe(false);
   });
 });

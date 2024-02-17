@@ -71,16 +71,6 @@ export function isNonEmptyString(value: any): value is string {
 }
 
 /**
- * Validates that a value is an array.
- *
- * @param value - The value to validate.
- * @returns Whether the value is an array or not.
- */
-export function isArray<T>(value: any): value is T[] {
-  return Array.isArray(value);
-}
-
-/**
    * 
 /**
  * Validates that a value is a nullable object.
@@ -89,7 +79,7 @@ export function isArray<T>(value: any): value is T[] {
  * @returns Whether the value is an object or not.
  */
 export function isObject(value: any): boolean {
-  return typeof value === 'object' && !isArray(value);
+  return typeof value === 'object' && !Array.isArray(value);
 }
 
 /**
