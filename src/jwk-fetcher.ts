@@ -10,7 +10,7 @@ interface JWKMetadata {
   keys: Array<JsonWebKeyWithKid>;
 }
 
-const isJWKMetadata = (value: any): value is JWKMetadata =>
+export const isJWKMetadata = (value: any): value is JWKMetadata => 
   isNonNullObject(value) && !!value.keys && isArray(value.keys);
 
 /**
