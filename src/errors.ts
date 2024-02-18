@@ -33,6 +33,10 @@ export enum JwtErrorCode {
  */
 export class AppErrorCodes {
   public static INVALID_CREDENTIAL = 'invalid-credential';
+  public static INTERNAL_ERROR = 'internal-error';
+  public static NETWORK_ERROR = 'network-error';
+  public static NETWORK_TIMEOUT = 'network-timeout';
+  public static UNABLE_TO_PARSE_RESPONSE = 'unable-to-parse-response';
 }
 
 /**
@@ -50,6 +54,10 @@ export class AuthClientErrorCode {
   public static ID_TOKEN_EXPIRED = {
     code: 'id-token-expired',
     message: 'The provided Firebase ID token is expired.',
+  };
+  public static INVALID_ID_TOKEN = {
+    code: 'invalid-id-token',
+    message: 'The provided ID token is not a valid Firebase ID token.',
   };
   public static ID_TOKEN_REVOKED = {
     code: 'id-token-revoked',
@@ -70,6 +78,10 @@ export class AuthClientErrorCode {
   public static SESSION_COOKIE_EXPIRED = {
     code: 'session-cookie-expired',
     message: 'The Firebase session cookie is expired.',
+  };
+  public static INVALID_SESSION_COOKIE_DURATION = {
+    code: 'invalid-session-cookie-duration',
+    message: 'The session cookie duration must be a valid number in milliseconds ' + 'between 5 minutes and 2 weeks.',
   };
 }
 
@@ -214,5 +226,24 @@ export class FirebaseAuthError extends PrefixedFirebaseError {
     // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
     /* tslint:enable:max-line-length */
     (this as any).__proto__ = FirebaseAuthError.prototype;
+  }
+}
+
+/**
+ * Firebase App error code structure. This extends PrefixedFirebaseError.
+ *
+ * @param code - The error code.
+ * @param message - The error message.
+ * @constructor
+ */
+export class FirebaseAppError extends PrefixedFirebaseError {
+  constructor(code: string, message: string) {
+    super('app', code, message);
+
+    /* tslint:disable:max-line-length */
+    // Set the prototype explicitly. See the following link for more details:
+    // https://github.com/Microsoft/TypeScript/wiki/Breaking-Changes#extending-built-ins-like-error-array-and-map-may-no-longer-work
+    /* tslint:enable:max-line-length */
+    (this as any).__proto__ = FirebaseAppError.prototype;
   }
 }

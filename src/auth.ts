@@ -1,17 +1,22 @@
+import { AuthApiClient } from './auth-api-requests';
 import type { EmulatorEnv } from './emulator';
 import { useEmulator } from './emulator';
+import { AuthClientErrorCode, FirebaseAuthError } from './errors';
 import type { KeyStorer } from './key-store';
 import type { FirebaseIdToken, FirebaseTokenVerifier } from './token-verifier';
 import { createIdTokenVerifier, createSessionCookieVerifier } from './token-verifier';
+import { isNonNullObject, isNumber } from './validator';
 
 export class BaseAuth {
   /** @internal */
   protected readonly idTokenVerifier: FirebaseTokenVerifier;
   protected readonly sessionCookieVerifier: FirebaseTokenVerifier;
+  private readonly authApiClient: AuthApiClient;
 
   constructor(projectId: string, keyStore: KeyStorer) {
     this.idTokenVerifier = createIdTokenVerifier(projectId, keyStore);
     this.sessionCookieVerifier = createSessionCookieVerifier(projectId, keyStore);
+    this.authApiClient = new AuthApiClient(projectId);
   }
 
   /**
@@ -32,6 +37,38 @@ export class BaseAuth {
   }
 
   /**
+   * Creates a new Firebase session cookie with the specified options. The created
+   * JWT string can be set as a server-side session cookie with a custom cookie
+   * policy, and be used for session management. The session cookie JWT will have
+   * the same payload claims as the provided ID token.
+   *
+   * See {@link https://firebase.google.com/docs/auth/admin/manage-cookies | Manage Session Cookies}
+   * for code samples and detailed documentation.
+   *
+   * @param idToken - The Firebase ID token to exchange for a session
+   *   cookie.
+   * @param sessionCookieOptions - The session
+   *   cookie options which includes custom session duration.
+   * @param env - An optional parameter specifying the environment in which the function is running.
+   *   If the function is running in an emulator environment, this should be set to `EmulatorEnv`.
+   *   If not specified, the function will assume it is running in a production environment.
+   *
+   * @returns A promise that resolves on success with the
+   *   created session cookie.
+   */
+  public createSessionCookie(
+    idToken: string,
+    sessionCookieOptions: SessionCookieOptions,
+    env?: EmulatorEnv
+  ): Promise<string> {
+    // Return rejected promise if expiresIn is not available.
+    if (!isNonNullObject(sessionCookieOptions) || !isNumber(sessionCookieOptions.expiresIn)) {
+      return Promise.reject(new FirebaseAuthError(AuthClientErrorCode.INVALID_SESSION_COOKIE_DURATION));
+    }
+    return this.authApiClient.createSessionCookie(idToken, sessionCookieOptions.expiresIn, env);
+  }
+
+  /**
    * Verifies a Firebase session cookie. Returns a Promise with the cookie claims.
    * Rejects the promise if the cookie could not be verified.
    *
@@ -47,6 +84,9 @@ export class BaseAuth {
    * for code samples and detailed documentation
    *
    * @param sessionCookie - The session cookie to verify.
+   * @param env - An optional parameter specifying the environment in which the function is running.
+   *   If the function is running in an emulator environment, this should be set to `EmulatorEnv`.
+   *   If not specified, the function will assume it is running in a production environment.
    *
    * @returns A promise fulfilled with the
    *   session cookie's decoded claims if the session cookie is valid; otherwise,
@@ -56,4 +96,16 @@ export class BaseAuth {
     const isEmulator = useEmulator(env);
     return this.sessionCookieVerifier.verifyJWT(sessionCookie, isEmulator);
   }
+}
+
+/**
+ * Interface representing the session cookie options needed for the
+ * {@link BaseAuth.createSessionCookie} method.
+ */
+export interface SessionCookieOptions {
+  /**
+   * The session cookie custom expiration in milliseconds. The minimum allowed is
+   * 5 minutes and the maxium allowed is 2 weeks.
+   */
+  expiresIn: number;
 }
