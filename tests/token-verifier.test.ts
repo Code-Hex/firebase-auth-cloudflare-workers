@@ -1,113 +1,96 @@
 import { describe, it, expect } from 'vitest';
 import { PublicKeySignatureVerifier, rs256alg } from '../src/jws-verifier';
-import type { FirebaseIdToken } from '../src/token-verifier';
-import { createFirebaseTokenVerifier, FIREBASE_AUDIENCE } from '../src/token-verifier';
-import { genIss, genTime, signJWT, TestingKeyFetcher } from './jwk-utils';
+import { FIREBASE_AUDIENCE, baseCreateIdTokenVerifier, baseCreateSessionCookieVerifier } from '../src/token-verifier';
+import { createTestingSignVerifyPair, generateIdToken, generateSessionCookie, projectId } from './firebase-utils';
+import { genTime, signJWT, TestingKeyFetcher } from './jwk-utils';
 
 describe('FirebaseTokenVerifier', () => {
-  const kid = 'kid123456';
-  const projectId = 'projectId1234';
-  const currentTimestamp = genTime(Date.now());
-  const userId = 'userId12345';
-  const payload: FirebaseIdToken = {
-    aud: projectId,
-    exp: currentTimestamp + 9999,
-    iat: currentTimestamp - 10000, // -10s
-    iss: genIss(projectId),
-    sub: userId,
-    auth_time: currentTimestamp - 20000, // -20s
-    uid: userId,
-    firebase: {
-      identities: {},
-      sign_in_provider: 'google.com',
+  const testCases = [
+    {
+      name: 'createIdTokenVerifier',
+      tokenGenerator: generateIdToken,
+      firebaseTokenVerifier: baseCreateIdTokenVerifier,
     },
-  };
+    {
+      name: 'createSessionCookieVerifier',
+      tokenGenerator: generateSessionCookie,
+      firebaseTokenVerifier: baseCreateSessionCookieVerifier,
+    },
+  ];
+  for (const tc of testCases) {
+    describe(tc.name, () => {
+      const currentTimestamp = genTime(Date.now());
 
-  it.each([
-    ['valid without firebase emulator', payload],
-    [
-      'valid custom token without firebase emulator',
-      {
-        ...payload,
-        aud: FIREBASE_AUDIENCE,
-      },
-    ],
-  ])('%s', async (_, payload) => {
-    const testingKeyFetcher = await TestingKeyFetcher.withKeyPairGeneration(kid);
-    const jwt = await signJWT(kid, payload, testingKeyFetcher.getPrivateKey());
+      it.each([
+        ['valid without firebase emulator', tc.tokenGenerator(currentTimestamp)],
+        [
+          'valid custom token without firebase emulator',
+          tc.tokenGenerator(currentTimestamp, { aud: FIREBASE_AUDIENCE }),
+        ],
+      ])('%s', async (_, promise) => {
+        const payload = await promise;
+        const pair = await createTestingSignVerifyPair(payload);
+        const ftv = tc.firebaseTokenVerifier(pair.verifier, projectId);
+        const token = await ftv.verifyJWT(pair.jwt, false);
 
-    const verifier = new PublicKeySignatureVerifier(testingKeyFetcher);
-    const ftv = createFirebaseTokenVerifier(verifier, projectId);
-    const token = await ftv.verifyJWT(jwt, false);
+        expect(token).toStrictEqual(payload);
+      });
 
-    expect(token).toStrictEqual(payload);
-  });
+      it.each([
+        ['aud', tc.tokenGenerator(currentTimestamp, { aud: 'unknown' }), 'has incorrect "aud" (audience) claim.'],
+        [
+          'iss',
+          tc.tokenGenerator(currentTimestamp, {
+            iss: projectId, // set just projectId
+          }),
+          'has incorrect "iss" (issuer) claim.',
+        ],
+        [
+          'sub',
+          tc.tokenGenerator(currentTimestamp, {
+            sub: 'x'.repeat(129),
+          }),
+          'has "sub" (subject) claim longer than 128 characters.',
+        ],
+        [
+          'auth_time',
+          tc.tokenGenerator(currentTimestamp, {
+            auth_time: undefined,
+          }),
+          'has no "auth_time" claim.',
+        ],
+        [
+          'auth_time is in future',
+          tc.tokenGenerator(currentTimestamp, {
+            auth_time: currentTimestamp + 3000, // +3s
+          }),
+          'has incorrect "auth_time" claim.',
+        ],
+      ])('invalid verifyPayload %s', async (_, promise, wantContainMsg) => {
+        const payload = await promise;
+        const pair = await createTestingSignVerifyPair(payload);
+        const ftv = tc.firebaseTokenVerifier(pair.verifier, projectId);
+        expect(() => ftv.verifyJWT(pair.jwt, false)).rejects.toThrowError(wantContainMsg);
+      });
 
-  it('valid with firebase emulator', async () => {
-    const testingKeyFetcher = await TestingKeyFetcher.withKeyPairGeneration(kid);
+      it('valid with firebase emulator', async () => {
+        const payload = await tc.tokenGenerator(currentTimestamp);
+        const testingKeyFetcher = await TestingKeyFetcher.withKeyPairGeneration('valid-kid');
 
-    // sign as invalid private key with fetched public key
-    const keyPair = await crypto.subtle.generateKey(rs256alg, true, ['sign', 'verify']);
+        // sign as invalid private key with fetched public key
+        const keyPair = await crypto.subtle.generateKey(rs256alg, true, ['sign', 'verify']);
 
-    // set with invalid kid because jwt does not contain kid which issued from firebase emulator.
-    const jwt = await signJWT('invalid-kid', payload, keyPair.privateKey);
+        // set with invalid kid because jwt does not contain kid which issued from firebase emulator.
+        const jwt = await signJWT('invalid-kid', payload, keyPair.privateKey);
 
-    const verifier = new PublicKeySignatureVerifier(testingKeyFetcher);
-    const ftv = createFirebaseTokenVerifier(verifier, projectId);
+        const verifier = new PublicKeySignatureVerifier(testingKeyFetcher);
+        const ftv = tc.firebaseTokenVerifier(verifier, projectId);
 
-    // firebase emulator ignores signature verification step.
-    const token = await ftv.verifyJWT(jwt, true);
+        // firebase emulator ignores signature verification step.
+        const token = await ftv.verifyJWT(jwt, true);
 
-    expect(token).toStrictEqual(payload);
-  });
-
-  it.each([
-    [
-      'aud',
-      {
-        ...payload,
-        aud: 'unknown',
-      },
-      'has incorrect "aud" (audience) claim.',
-    ],
-    [
-      'iss',
-      {
-        ...payload,
-        iss: projectId, // set just projectId
-      },
-      'has incorrect "iss" (issuer) claim.',
-    ],
-    [
-      'sub',
-      {
-        ...payload,
-        sub: 'x'.repeat(129),
-      },
-      'has "sub" (subject) claim longer than 128 characters.',
-    ],
-    [
-      'auth_time',
-      {
-        ...payload,
-        auth_time: undefined,
-      },
-      'has no "auth_time" claim.',
-    ],
-    [
-      'auth_time is in future',
-      {
-        ...payload,
-        auth_time: currentTimestamp + 3000, // +3s
-      },
-      'has incorrect "auth_time" claim.',
-    ],
-  ])('invalid verifyPayload %s', async (_, payload, wantContainMsg) => {
-    const testingKeyFetcher = await TestingKeyFetcher.withKeyPairGeneration(kid);
-    const jwt = await signJWT(kid, payload, testingKeyFetcher.getPrivateKey());
-
-    const verifier = new PublicKeySignatureVerifier(testingKeyFetcher);
-    const ftv = createFirebaseTokenVerifier(verifier, projectId);
-    expect(() => ftv.verifyJWT(jwt, false)).rejects.toThrowError(wantContainMsg);
-  });
+        expect(token).toStrictEqual(payload);
+      });
+    });
+  }
 });

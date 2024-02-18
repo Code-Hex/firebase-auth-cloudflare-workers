@@ -67,6 +67,10 @@ export class AuthClientErrorCode {
     code: 'user-disabled',
     message: 'The user record is disabled.',
   };
+  public static SESSION_COOKIE_EXPIRED = {
+    code: 'session-cookie-expired',
+    message: 'The Firebase session cookie is expired.',
+  };
 }
 
 /**
