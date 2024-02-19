@@ -161,7 +161,7 @@ describe('parseMaxAge', () => {
 
 describe('isJWKMetadata', () => {
   it('should return true for valid JWKMetadata', () => {
-    const valid = JSON.parse(validResponseJSON)
+    const valid = JSON.parse(validResponseJSON);
     expect(isJWKMetadata(valid)).toBe(true);
   });
 

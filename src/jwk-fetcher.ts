@@ -12,17 +12,17 @@ interface JWKMetadata {
 
 export const isJWKMetadata = (value: any): value is JWKMetadata => {
   if (!isNonNullObject(value) || !value.keys) {
-    return false
+    return false;
   }
-  const keys = value.keys
+  const keys = value.keys;
   if (!Array.isArray(keys)) {
-    return false
+    return false;
   }
-  const filtered = keys.filter((key): key is JsonWebKeyWithKid => 
-    isObject(key) && !!key.kid && typeof key.kid === 'string'
-  )
-  return keys.length === filtered.length
-}
+  const filtered = keys.filter(
+    (key): key is JsonWebKeyWithKid => isObject(key) && !!key.kid && typeof key.kid === 'string'
+  );
+  return keys.length === filtered.length;
+};
 
 /**
  * Class to fetch public keys from a client certificates URL.
