@@ -1,5 +1,4 @@
-import { encodeObjectBase64Url } from './../tests/jwk-utils';
-import { decodeBase64, encodeBase64Url } from './base64';
+import { decodeBase64, encodeBase64Url, encodeObjectBase64Url } from './base64';
 import { AppErrorCodes, FirebaseAppError } from './errors';
 import { isNonEmptyString, isNonNullObject } from './validator';
 

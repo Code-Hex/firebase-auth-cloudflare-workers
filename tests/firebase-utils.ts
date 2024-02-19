@@ -1,5 +1,5 @@
 import type { Credential } from '../src';
-import { encodeBase64Url } from '../src/base64';
+import { encodeBase64Url, encodeObjectBase64Url } from '../src/base64';
 import type { GoogleOAuthAccessToken } from '../src/credential';
 import type { EmulatorEnv } from '../src/emulator';
 import { emulatorHost } from '../src/emulator';
@@ -8,7 +8,7 @@ import { PublicKeySignatureVerifier } from '../src/jws-verifier';
 import { FIREBASE_AUDIENCE, type FirebaseIdToken } from '../src/token-verifier';
 import { utf8Encoder } from '../src/utf8';
 import { isNonEmptyString, isNonNullObject } from '../src/validator';
-import { signJWT, genTime, genIss, TestingKeyFetcher, encodeObjectBase64Url } from './jwk-utils';
+import { signJWT, genTime, genIss, TestingKeyFetcher } from './jwk-utils';
 
 export const projectId = 'project12345'; // see package.json
 export const userId = 'userId12345';

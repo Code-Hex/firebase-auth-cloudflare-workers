@@ -1,4 +1,4 @@
-import { encodeBase64Url } from '../src/base64';
+import { encodeBase64Url, encodeObjectBase64Url } from '../src/base64';
 import type { KeyFetcher } from '../src/jwk-fetcher';
 import { rs256alg } from '../src/jws-verifier';
 import type { DecodedHeader, DecodedPayload, JsonWebKeyWithKid } from '../src/jwt-decoder';
@@ -27,10 +27,6 @@ export class TestingKeyFetcher implements KeyFetcher {
 
 export const genTime = (ms: number = Date.now()): number => Math.floor(ms / 1000);
 export const genIss = (projectId: string = 'projectId1234'): string => 'https://securetoken.google.com/' + projectId;
-
-export const encodeObjectBase64Url = (obj: any): string => encodeBase64Url(jsonUTF8Stringify(obj));
-
-const jsonUTF8Stringify = (obj: any): Uint8Array => utf8Encoder.encode(JSON.stringify(obj));
 
 export const signJWT = async (kid: string, payload: DecodedPayload, privateKey: CryptoKey) => {
   const header: DecodedHeader = {
