@@ -1,9 +1,14 @@
 import { describe, expect, it } from 'vitest';
 import { BaseAuth } from '../src/auth';
-import { EmulatorCredential } from '../src/credential';
 import { FirebaseAuthError } from '../src/errors';
 import type { EmulatorEnv, KeyStorer } from './../src/index';
-import { EmulatedSigner, FirebaseTokenGenerator, projectId, signInWithCustomToken } from './firebase-utils';
+import {
+  EmulatedSigner,
+  FirebaseTokenGenerator,
+  NopCredential,
+  projectId,
+  signInWithCustomToken,
+} from './firebase-utils';
 
 const env: EmulatorEnv = {
   FIREBASE_AUTH_EMULATOR_HOST: 'localhost:9099',
@@ -25,7 +30,7 @@ describe('createSessionCookie()', () => {
 
   it('creates a valid Firebase session cookie', async () => {
     const keyStorer = new InMemoryKeyStorer('cache-key');
-    const auth = new BaseAuth(projectId, keyStorer, new EmulatorCredential());
+    const auth = new BaseAuth(projectId, keyStorer, new NopCredential());
 
     const signer = new EmulatedSigner();
     const tokenGenerator = new FirebaseTokenGenerator(signer);
@@ -63,7 +68,7 @@ describe('createSessionCookie()', () => {
   describe('verifySessionCookie()', () => {
     const uid = sessionCookieUids[0];
     const keyStorer = new InMemoryKeyStorer('cache-key');
-    const auth = new BaseAuth(projectId, keyStorer, new EmulatorCredential());
+    const auth = new BaseAuth(projectId, keyStorer, new NopCredential());
     it('fails when called with an invalid session cookie', async () => {
       await expect(auth.verifySessionCookie('invalid-token')).rejects.toThrowError(FirebaseAuthError);
     });

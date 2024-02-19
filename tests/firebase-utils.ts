@@ -1,4 +1,6 @@
+import type { Credential } from '../src';
 import { encodeBase64Url } from '../src/base64';
+import type { GoogleOAuthAccessToken } from '../src/credential';
 import type { EmulatorEnv } from '../src/emulator';
 import { emulatorHost } from '../src/emulator';
 import { AuthClientErrorCode, FirebaseAuthError } from '../src/errors';
@@ -261,4 +263,13 @@ export async function signInWithCustomToken(
   }
   const json = await res.json();
   return json as signInWithCustomTokenResponse;
+}
+
+export class NopCredential implements Credential {
+  getAccessToken(): Promise<GoogleOAuthAccessToken> {
+    return Promise.resolve({
+      access_token: 'owner',
+      expires_in: 9 * 3600,
+    });
+  }
 }

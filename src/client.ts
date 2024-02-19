@@ -1,7 +1,7 @@
 import { version } from '../package.json';
 import type { ApiSettings } from './api-requests';
 import type { Credential } from './credential';
-import { type EmulatorEnv } from './emulator';
+import { useEmulator, type EmulatorEnv } from './emulator';
 import { AppErrorCodes, FirebaseAppError } from './errors';
 
 /**
@@ -60,7 +60,10 @@ export class BaseClient {
     private retryConfig: RetryConfig = defaultRetryConfig()
   ) {}
 
-  private async getToken(): Promise<string> {
+  private async getToken(env?: EmulatorEnv): Promise<string> {
+    if (useEmulator(env)) {
+      return 'owner';
+    }
     const result = await this.credential.getAccessToken();
     return result.access_token;
   }
@@ -71,7 +74,7 @@ export class BaseClient {
       const requestValidator = apiSettings.getRequestValidator();
       requestValidator(requestData);
     }
-    const token = await this.getToken();
+    const token = await this.getToken(env);
     const method = apiSettings.getHttpMethod();
     const signal = AbortSignal.timeout(25000); // 25s
     return await this.fetchWithRetry<T>(fullUrl, {

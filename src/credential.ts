@@ -37,18 +37,6 @@ export interface Credential {
   getAccessToken(): Promise<GoogleOAuthAccessToken>;
 }
 
-/**
- * Implementation of Credential that uses with emulator.
- */
-export class EmulatorCredential implements Credential {
-  public async getAccessToken(): Promise<GoogleOAuthAccessToken> {
-    return {
-      access_token: 'owner',
-      expires_in: 90 * 3600 * 3600,
-    };
-  }
-}
-
 const GOOGLE_TOKEN_AUDIENCE = 'https://accounts.google.com/o/oauth2/token';
 const GOOGLE_AUTH_TOKEN_HOST = 'accounts.google.com';
 const GOOGLE_AUTH_TOKEN_PATH = '/o/oauth2/token';

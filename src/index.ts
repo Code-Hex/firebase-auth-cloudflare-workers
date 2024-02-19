@@ -3,7 +3,7 @@ import type { Credential } from './credential';
 import type { KeyStorer } from './key-store';
 import { WorkersKVStore } from './key-store';
 
-export { type Credential, ServiceAccountCredential, EmulatorCredential } from './credential';
+export { type Credential, ServiceAccountCredential } from './credential';
 export { emulatorHost, useEmulator } from './emulator';
 export type { KeyStorer };
 export type { EmulatorEnv } from './emulator';
