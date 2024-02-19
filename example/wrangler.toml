@@ -21,7 +21,7 @@ FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099"
 EMAIL_ADDRESS = "test@example.com"
 PASSWORD = "test1234"
 
-PROJECT_ID = "example-project12345" # see package.json (for emulator)
+PROJECT_ID = "project12345" # see package.json (for emulator)
 
 # Specify cache key to store and get public jwk.
 PUBLIC_JWK_CACHE_KEY = "public-jwk-cache-key"

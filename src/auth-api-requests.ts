@@ -59,6 +59,7 @@ export class AuthApiClient extends BaseClient {
       // Convert to seconds.
       validDuration: expiresIn / 1000,
     };
-    return await this.fetch(FIREBASE_AUTH_CREATE_SESSION_COOKIE, request, env);
+    const res = await this.fetch<{ sessionCookie: string }>(FIREBASE_AUTH_CREATE_SESSION_COOKIE, request, env);
+    return res.sessionCookie;
   }
 }

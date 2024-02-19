@@ -1,7 +1,8 @@
 import { AuthApiClient } from './auth-api-requests';
+import type { Credential } from './credential';
 import type { EmulatorEnv } from './emulator';
 import { useEmulator } from './emulator';
-import { AuthClientErrorCode, FirebaseAuthError } from './errors';
+import { AppErrorCodes, AuthClientErrorCode, FirebaseAppError, FirebaseAuthError } from './errors';
 import type { KeyStorer } from './key-store';
 import type { FirebaseIdToken, FirebaseTokenVerifier } from './token-verifier';
 import { createIdTokenVerifier, createSessionCookieVerifier } from './token-verifier';
@@ -11,12 +12,22 @@ export class BaseAuth {
   /** @internal */
   protected readonly idTokenVerifier: FirebaseTokenVerifier;
   protected readonly sessionCookieVerifier: FirebaseTokenVerifier;
-  private readonly authApiClient: AuthApiClient;
+  private readonly _authApiClient?: AuthApiClient;
 
-  constructor(projectId: string, keyStore: KeyStorer) {
+  constructor(projectId: string, keyStore: KeyStorer, credential?: Credential) {
     this.idTokenVerifier = createIdTokenVerifier(projectId, keyStore);
     this.sessionCookieVerifier = createSessionCookieVerifier(projectId, keyStore);
-    this.authApiClient = new AuthApiClient(projectId);
+
+    if (credential) {
+      this._authApiClient = new AuthApiClient(projectId, credential);
+    }
+  }
+
+  private get authApiClient(): AuthApiClient {
+    if (this._authApiClient) {
+      return this._authApiClient;
+    }
+    throw new FirebaseAppError(AppErrorCodes.INVALID_CREDENTIAL, 'Service account must be required in initialization.');
   }
 
   /**
@@ -56,16 +67,16 @@ export class BaseAuth {
    * @returns A promise that resolves on success with the
    *   created session cookie.
    */
-  public createSessionCookie(
+  public async createSessionCookie(
     idToken: string,
     sessionCookieOptions: SessionCookieOptions,
     env?: EmulatorEnv
   ): Promise<string> {
     // Return rejected promise if expiresIn is not available.
     if (!isNonNullObject(sessionCookieOptions) || !isNumber(sessionCookieOptions.expiresIn)) {
-      return Promise.reject(new FirebaseAuthError(AuthClientErrorCode.INVALID_SESSION_COOKIE_DURATION));
+      throw new FirebaseAuthError(AuthClientErrorCode.INVALID_SESSION_COOKIE_DURATION);
     }
-    return this.authApiClient.createSessionCookie(idToken, sessionCookieOptions.expiresIn, env);
+    return await this.authApiClient.createSessionCookie(idToken, sessionCookieOptions.expiresIn, env);
   }
 
   /**

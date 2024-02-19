@@ -1,6 +1,7 @@
 import { version } from '../package.json';
 import type { ApiSettings } from './api-requests';
-import type { EmulatorEnv } from './emulator';
+import type { Credential } from './credential';
+import { type EmulatorEnv } from './emulator';
 import { AppErrorCodes, FirebaseAppError } from './errors';
 
 /**
@@ -55,8 +56,14 @@ export function buildApiUrl(projectId: string, apiSettings: ApiSettings, env?: E
 export class BaseClient {
   constructor(
     private projectId: string,
+    private credential: Credential,
     private retryConfig: RetryConfig = defaultRetryConfig()
   ) {}
+
+  private async getToken(): Promise<string> {
+    const result = await this.credential.getAccessToken();
+    return result.access_token;
+  }
 
   protected async fetch<T>(apiSettings: ApiSettings, requestData?: object, env?: EmulatorEnv): Promise<T> {
     const fullUrl = buildApiUrl(this.projectId, apiSettings, env);
@@ -64,11 +71,13 @@ export class BaseClient {
       const requestValidator = apiSettings.getRequestValidator();
       requestValidator(requestData);
     }
+    const token = await this.getToken();
     const method = apiSettings.getHttpMethod();
     const signal = AbortSignal.timeout(25000); // 25s
     return await this.fetchWithRetry<T>(fullUrl, {
       method,
       headers: {
+        Authorization: `Bearer ${token}`,
         'User-Agent': `Code-Hex/firebase-auth-cloudflare-workers/${version}`,
         'X-Client-Version': `Code-Hex/firebase-auth-cloudflare-workers/${version}`,
         'Content-Type': 'application/json;charset=utf-8',

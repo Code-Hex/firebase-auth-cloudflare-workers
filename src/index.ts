@@ -1,4 +1,5 @@
 import { BaseAuth } from './auth';
+import type { Credential } from './credential';
 import type { KeyStorer } from './key-store';
 import { WorkersKVStore } from './key-store';
 
@@ -10,13 +11,13 @@ export type { FirebaseIdToken } from './token-verifier';
 export class Auth extends BaseAuth {
   private static instance?: Auth;
 
-  private constructor(projectId: string, keyStore: KeyStorer) {
-    super(projectId, keyStore);
+  private constructor(projectId: string, keyStore: KeyStorer, credential?: Credential) {
+    super(projectId, keyStore, credential);
   }
 
-  static getOrInitialize(projectId: string, keyStore: KeyStorer): Auth {
+  static getOrInitialize(projectId: string, keyStore: KeyStorer, credential?: Credential): Auth {
     if (!Auth.instance) {
-      Auth.instance = new Auth(projectId, keyStore);
+      Auth.instance = new Auth(projectId, keyStore, credential);
     }
     return Auth.instance;
   }
