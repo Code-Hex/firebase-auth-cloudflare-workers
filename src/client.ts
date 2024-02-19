@@ -1,8 +1,8 @@
-import { version } from '../package.json';
 import type { ApiSettings } from './api-requests';
 import type { Credential } from './credential';
 import { useEmulator, type EmulatorEnv } from './emulator';
 import { AppErrorCodes, FirebaseAppError } from './errors';
+import { version } from './version';
 
 /**
  * Specifies how failing HTTP requests should be retried.

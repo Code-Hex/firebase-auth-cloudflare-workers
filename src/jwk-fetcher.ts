@@ -63,7 +63,7 @@ export class UrlKeyFetcher implements KeyFetcher {
 
     // store the public keys cache in the KV store.
     const maxAge = parseMaxAge(cacheControlHeader);
-    if (!isNaN(maxAge)) {
+    if (!isNaN(maxAge) && maxAge > 0) {
       await this.keyStorer.put(JSON.stringify(publicKeys.keys), maxAge);
     }
 
