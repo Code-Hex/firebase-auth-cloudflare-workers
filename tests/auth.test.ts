@@ -11,7 +11,7 @@ import {
 } from './firebase-utils';
 
 const env: EmulatorEnv = {
-  FIREBASE_AUTH_EMULATOR_HOST: 'localhost:9099',
+  FIREBASE_AUTH_EMULATOR_HOST: '127.0.0.1:9099',
 };
 
 describe('createSessionCookie()', () => {

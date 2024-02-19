@@ -20,8 +20,8 @@ describe('buildApiUrl', () => {
   it('should build correct url for emulator environment', () => {
     const projectId = 'test-project';
     const apiSettings = new ApiSettings('v1', '/test-endpoint');
-    const env: EmulatorEnv = { FIREBASE_AUTH_EMULATOR_HOST: 'localhost:9099' };
-    const expectedUrl = 'http://localhost:9099/identitytoolkit.googleapis.com/v1/projects/test-project/test-endpoint';
+    const env: EmulatorEnv = { FIREBASE_AUTH_EMULATOR_HOST: '127.0.0.1:9099' };
+    const expectedUrl = 'http://127.0.0.1:9099/identitytoolkit.googleapis.com/v1/projects/test-project/test-endpoint';
 
     const result = buildApiUrl(projectId, apiSettings, env);
 
