@@ -405,16 +405,60 @@ export const ID_TOKEN_INFO: FirebaseTokenInfo = {
  */
 export function createIdTokenVerifier(projectID: string, keyStorer: KeyStorer): FirebaseTokenVerifier {
   const signatureVerifier = PublicKeySignatureVerifier.withCertificateUrl(CLIENT_JWK_URL, keyStorer);
-  return createFirebaseTokenVerifier(signatureVerifier, projectID);
+  return baseCreateIdTokenVerifier(signatureVerifier, projectID);
 }
 
 /**
  * @internal
  * @returns FirebaseTokenVerifier
  */
-export function createFirebaseTokenVerifier(
+export function baseCreateIdTokenVerifier(
   signatureVerifier: SignatureVerifier,
   projectID: string
 ): FirebaseTokenVerifier {
   return new FirebaseTokenVerifier(signatureVerifier, projectID, 'https://securetoken.google.com/', ID_TOKEN_INFO);
+}
+
+// URL containing the public keys for Firebase session cookies.
+const SESSION_COOKIE_CERT_URL = 'https://identitytoolkit.googleapis.com/v1/sessionCookiePublicKeys';
+
+/**
+ * User facing token information related to the Firebase session cookie.
+ *
+ * @internal
+ */
+export const SESSION_COOKIE_INFO: FirebaseTokenInfo = {
+  url: 'https://firebase.google.com/docs/auth/admin/manage-cookies',
+  verifyApiName: 'verifySessionCookie()',
+  jwtName: 'Firebase session cookie',
+  shortName: 'session cookie',
+  expiredErrorCode: AuthClientErrorCode.SESSION_COOKIE_EXPIRED,
+};
+
+/**
+ * Creates a new FirebaseTokenVerifier to verify Firebase session cookies.
+ *
+ * @internal
+ * @param app - Firebase app instance.
+ * @returns FirebaseTokenVerifier
+ */
+export function createSessionCookieVerifier(projectID: string, keyStorer: KeyStorer): FirebaseTokenVerifier {
+  const signatureVerifier = PublicKeySignatureVerifier.withCertificateUrl(SESSION_COOKIE_CERT_URL, keyStorer);
+  return baseCreateSessionCookieVerifier(signatureVerifier, projectID);
+}
+
+/**
+ * @internal
+ * @returns FirebaseTokenVerifier
+ */
+export function baseCreateSessionCookieVerifier(
+  signatureVerifier: SignatureVerifier,
+  projectID: string
+): FirebaseTokenVerifier {
+  return new FirebaseTokenVerifier(
+    signatureVerifier,
+    projectID,
+    'https://session.firebase.google.com/',
+    SESSION_COOKIE_INFO
+  );
 }

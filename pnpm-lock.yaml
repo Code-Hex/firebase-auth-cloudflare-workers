@@ -35,6 +35,9 @@ devDependencies:
   firebase-tools:
     specifier: ^13.3.0
     version: 13.3.0
+  hono:
+    specifier: ^4.0.4
+    version: 4.0.4
   miniflare:
     specifier: ^3.20240129.3
     version: 3.20240129.3
@@ -47,6 +50,9 @@ devDependencies:
   typescript:
     specifier: ^5.3.3
     version: 5.3.3
+  undici:
+    specifier: ^6.6.2
+    version: 6.6.2
   vitest:
     specifier: ^1.3.0
     version: 1.3.0
@@ -3691,6 +3697,11 @@ packages:
     engines: {node: '>=10.0.0'}
     dev: true
 
+  /hono@4.0.4:
+    resolution: {integrity: sha512-WIwMh3b9TrtcdGpJ9ljA74bK/njL6f9S0nH3eBIKVAudnuHDqyVi4k0P8etD9HVU3xu74a9KBg3xA6UlXGEIZg==}
+    engines: {node: '>=16.0.0'}
+    dev: true
+
   /hosted-git-info@2.8.9:
     resolution: {integrity: sha512-mxIDAb9Lsm6DoOJ7xH+5+X4y1LU/4Hi50L9C5sIswK3JzULS4bwk1FvjdBgvYR4bzT4tuUQiC15FE2f5HbLvYw==}
     dev: true
@@ -6524,6 +6535,13 @@ packages:
   /undici@5.28.3:
     resolution: {integrity: sha512-3ItfzbrhDlINjaP0duwnNsKpDQk3acHI3gVJ1z4fmwMK31k5G9OVIAMLSIaP6w4FaGkaAkN6zaQO9LUvZ1t7VA==}
     engines: {node: '>=14.0'}
+    dependencies:
+      '@fastify/busboy': 2.1.0
+    dev: true
+
+  /undici@6.6.2:
+    resolution: {integrity: sha512-vSqvUE5skSxQJ5sztTZ/CdeJb1Wq0Hf44hlYMciqHghvz+K88U0l7D6u1VsndoFgskDcnU+nG3gYmMzJVzd9Qg==}
+    engines: {node: '>=18.0'}
     dependencies:
       '@fastify/busboy': 2.1.0
     dev: true

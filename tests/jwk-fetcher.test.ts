@@ -1,7 +1,7 @@
 import { Miniflare } from 'miniflare';
 import { describe, it, expect, vi } from 'vitest';
 import type { Fetcher } from '../src/jwk-fetcher';
-import { parseMaxAge, UrlKeyFetcher } from '../src/jwk-fetcher';
+import { isJWKMetadata, parseMaxAge, UrlKeyFetcher } from '../src/jwk-fetcher';
 import { WorkersKVStore } from '../src/key-store';
 
 class HTTPMockFetcher implements Fetcher {
@@ -156,5 +156,50 @@ describe('parseMaxAge', () => {
   ])('%s', (_, cacheControlHeader, want) => {
     const maxAge = parseMaxAge(cacheControlHeader);
     expect(maxAge).toStrictEqual(want);
+  });
+});
+
+describe('isJWKMetadata', () => {
+  it('should return true for valid JWKMetadata', () => {
+    const valid = JSON.parse(validResponseJSON);
+    expect(isJWKMetadata(valid)).toBe(true);
+  });
+
+  it('should return false for null', () => {
+    expect(isJWKMetadata(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isJWKMetadata(undefined)).toBe(false);
+  });
+
+  it('should return false for non-object', () => {
+    expect(isJWKMetadata('string')).toBe(false);
+    expect(isJWKMetadata(123)).toBe(false);
+    expect(isJWKMetadata(true)).toBe(false);
+  });
+
+  it('should return false for object without keys property', () => {
+    const invalidJWKMetadata = {
+      notKeys: [],
+    };
+    expect(isJWKMetadata(invalidJWKMetadata)).toBe(false);
+  });
+
+  it('returns false if keys is not an array', () => {
+    expect(isJWKMetadata({ keys: {} })).toBe(false);
+    expect(isJWKMetadata({ keys: 'string' })).toBe(false);
+  });
+
+  it('returns false if keys is an array but its elements do not have a kid property', () => {
+    expect(isJWKMetadata({ keys: [{}] })).toBe(false);
+  });
+
+  it('returns false if keys is an array but kid is not a string', () => {
+    expect(isJWKMetadata({ keys: [{ kid: 123 }] })).toBe(false);
+  });
+
+  it('returns false if only some keys have a kid property that is a string', () => {
+    expect(isJWKMetadata({ keys: [{ kid: 'string' }, {}] })).toBe(false);
   });
 });

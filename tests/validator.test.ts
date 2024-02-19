@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isArray, isNonEmptyString, isNonNullObject, isNumber, isObject, isString, isURL } from '../src/validator';
+import { isNonEmptyString, isNonNullObject, isNumber, isObject, isString, isURL } from '../src/validator';
 
 describe('validator', () => {
   describe('isURL', () => {
@@ -72,22 +72,6 @@ describe('validator', () => {
       const strings = [' ', 'foo'];
       strings.forEach(v => {
         it(`${v}`, () => expect(isNonEmptyString(v)).toBeTruthy());
-      });
-    });
-  });
-
-  describe('isArray', () => {
-    describe('non-array', () => {
-      const nonArrays = [undefined, null, NaN, 0, 1, '', 'a', true, false, {}, { a: 1 }];
-      nonArrays.forEach(v => {
-        it(`${v}`, () => expect(isArray(v)).toBeFalsy());
-      });
-    });
-
-    describe('array', () => {
-      const arrays = [[], [1, 2, 3], [], [1, 2, 3]];
-      arrays.forEach(v => {
-        it(`${v}`, () => expect(isArray(v)).toBeTruthy());
       });
     });
   });

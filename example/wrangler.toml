@@ -1,6 +1,7 @@
 name = "firebase-auth-example"
-compatibility_date = "2022-07-05"
+compatibility_date = "2023-12-01"
 workers_dev = true
+main = "index.ts"
 
 tsconfig = "./tsconfig.json"
 
@@ -21,12 +22,12 @@ FIREBASE_AUTH_EMULATOR_HOST = "127.0.0.1:9099"
 EMAIL_ADDRESS = "test@example.com"
 PASSWORD = "test1234"
 
-PROJECT_ID = "example-project12345" # see package.json (for emulator)
+PROJECT_ID = "project12345" # see package.json (for emulator)
 
 # Specify cache key to store and get public jwk.
 PUBLIC_JWK_CACHE_KEY = "public-jwk-cache-key"
 
 [[kv_namespaces]]
 binding = "PUBLIC_JWK_CACHE_KV"
-id = ""
+id = "testingId"
 preview_id = "testingId"

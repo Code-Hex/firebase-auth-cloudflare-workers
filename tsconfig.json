@@ -1,6 +1,6 @@
 {
   "compilerOptions": {
-    "target": "es2020",
+    "target": "es2022",
     "module": "commonjs",
     "declaration": true,
     "moduleResolution": "node",
@@ -13,6 +13,7 @@
     "strictNullChecks": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
+    "resolveJsonModule": true,
     "types": [
       "@cloudflare/workers-types"
     ],
