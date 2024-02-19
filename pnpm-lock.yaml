@@ -35,6 +35,9 @@ devDependencies:
   firebase-tools:
     specifier: ^13.3.0
     version: 13.3.0
+  hono:
+    specifier: ^4.0.4
+    version: 4.0.4
   miniflare:
     specifier: ^3.20240129.3
     version: 3.20240129.3
@@ -3692,6 +3695,11 @@ packages:
   /heap-js@2.3.0:
     resolution: {integrity: sha512-E5303mzwQ+4j/n2J0rDvEPBN7GKjhis10oHiYOgjxsmxYgqG++hz9NyLLOXttzH8as/DyiBHYpUrJTZWYaMo8Q==}
     engines: {node: '>=10.0.0'}
+    dev: true
+
+  /hono@4.0.4:
+    resolution: {integrity: sha512-WIwMh3b9TrtcdGpJ9ljA74bK/njL6f9S0nH3eBIKVAudnuHDqyVi4k0P8etD9HVU3xu74a9KBg3xA6UlXGEIZg==}
+    engines: {node: '>=16.0.0'}
     dev: true
 
   /hosted-git-info@2.8.9:

@@ -1,37 +1,38 @@
-import type { EmulatorEnv } from '../src';
+import { Hono } from 'hono';
 import { Auth, emulatorHost, WorkersKVStoreSingle } from '../src';
 
-interface Bindings extends EmulatorEnv {
+type Env = {
   EMAIL_ADDRESS: string;
   PASSWORD: string;
-  FIREBASE_AUTH_EMULATOR_HOST: string;
   PUBLIC_JWK_CACHE_KV: KVNamespace;
   PROJECT_ID: string;
   PUBLIC_JWK_CACHE_KEY: string;
-}
+
+  FIREBASE_AUTH_EMULATOR_HOST: string; // satisfied EmulatorEnv
+};
+
+const app = new Hono<{ Bindings: Env }>();
 
 const signInPath = '/identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=test1234';
 
-export async function handleRequest(req: Request, env: Bindings) {
-  const url = new URL(req.url);
-  const firebaseEmuHost = emulatorHost(env);
-  if (url.pathname === '/get-jwt' && !!firebaseEmuHost) {
-    const firebaseEmulatorSignInUrl = 'http://' + firebaseEmuHost + signInPath;
-    const resp = await fetch(firebaseEmulatorSignInUrl, {
-      method: 'POST',
-      body: JSON.stringify({
-        email: env.EMAIL_ADDRESS,
-        password: env.PASSWORD,
-        returnSecureToken: true,
-      }),
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    });
-    return resp;
-  }
+app.get('/get-jwt', async c => {
+  const firebaseEmuHost = emulatorHost(c.env);
+  const firebaseEmulatorSignInUrl = 'http://' + firebaseEmuHost + signInPath;
+  return await fetch(firebaseEmulatorSignInUrl, {
+    method: 'POST',
+    body: JSON.stringify({
+      email: c.env.EMAIL_ADDRESS,
+      password: c.env.PASSWORD,
+      returnSecureToken: true,
+    }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+});
 
-  const authorization = req.headers.get('Authorization');
+app.post('/verify-header', async c => {
+  const authorization = c.req.raw.headers.get('Authorization');
   if (authorization === null) {
     return new Response(null, {
       status: 400,
@@ -39,16 +40,16 @@ export async function handleRequest(req: Request, env: Bindings) {
   }
   const jwt = authorization.replace(/Bearer\s+/i, '');
   const auth = Auth.getOrInitialize(
-    env.PROJECT_ID,
-    WorkersKVStoreSingle.getOrInitialize(env.PUBLIC_JWK_CACHE_KEY, env.PUBLIC_JWK_CACHE_KV)
+    c.env.PROJECT_ID,
+    WorkersKVStoreSingle.getOrInitialize(c.env.PUBLIC_JWK_CACHE_KEY, c.env.PUBLIC_JWK_CACHE_KV)
   );
-  const firebaseToken = await auth.verifyIdToken(jwt, env);
+  const firebaseToken = await auth.verifyIdToken(jwt, c.env);
 
   return new Response(JSON.stringify(firebaseToken), {
     headers: {
       'Content-Type': 'application/json',
     },
   });
-}
+});
 
-export default { fetch: handleRequest };
+export default app;
