@@ -1,3 +1,5 @@
+import { utf8Encoder } from './utf8';
+
 export const decodeBase64Url = (str: string): Uint8Array => {
   return decodeBase64(str.replace(/_|-/g, m => ({ _: '/', '-': '+' })[m] ?? m));
 };
@@ -23,3 +25,6 @@ export const decodeBase64 = (str: string): Uint8Array => {
   }
   return bytes;
 };
+
+const jsonUTF8Stringify = (obj: any): Uint8Array => utf8Encoder.encode(JSON.stringify(obj));
+export const encodeObjectBase64Url = (obj: any): string => encodeBase64Url(jsonUTF8Stringify(obj));

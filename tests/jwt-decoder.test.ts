@@ -1,8 +1,9 @@
 import { describe, it, expect } from 'vitest';
+import { encodeObjectBase64Url } from '../src/base64';
 import { JwtError, JwtErrorCode } from '../src/errors';
 import type { DecodedHeader, DecodedPayload } from '../src/jwt-decoder';
 import { RS256Token } from '../src/jwt-decoder';
-import { genTime, genIss, signJWT, TestingKeyFetcher, encodeObjectBase64Url } from './jwk-utils';
+import { genTime, genIss, signJWT, TestingKeyFetcher } from './jwk-utils';
 
 describe('TokenDecoder', () => {
   const kid = 'kid123456';
