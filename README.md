@@ -129,6 +129,25 @@ See the [ID Token section of the OpenID Connect spec](http://openid.net/specs/op
 - `idToken` The ID token to verify.
 - `env` is an optional parameter. but this is using to detect should use emulator or not.
 
+### `authObj.verifySessionCookie(sessionCookie: string, env?: EmulatorEnv): Promise<FirebaseIdToken>`
+
+Verifies a Firebase session cookie. Returns a Promise with the cookie claims. Rejects the promise if the cookie could not be verified.
+
+See [Verify Session Cookies](https://firebase.google.com/docs/auth/admin/manage-cookies#verify_session_cookie_and_check_permissions) for code samples and detailed documentation.
+
+- `sessionCookie` The session cookie to verify.
+- `env` is an optional parameter. but this is using to detect should use emulator or not.
+
+### `authObj.createSessionCookie(idToken: string, sessionCookieOptions: SessionCookieOptions, env?: EmulatorEnv): Promise<string>`
+
+Creates a new Firebase session cookie with the specified options. The created JWT string can be set as a server-side session cookie with a custom cookie policy, and be used for session management. The session cookie JWT will have the same payload claims as the provided ID token. See [Manage Session Cookies](https://firebase.google.com/docs/auth/admin/manage-cookies) for code samples and detailed documentation.
+
+- `idToken` The Firebase ID token to exchange for a session cookie.
+- `sessionCookieOptions` The session cookie options which includes custom session duration.
+- `env` is an optional parameter. but this is using to detect should use emulator or not.
+
+**Required** service acccount credential to use this API. You need to set the credentials with `Auth.getOrInitialize`.
+
 ### `WorkersKVStoreSingle.getOrInitialize(cacheKey: string, cfKVNamespace: KVNamespace): WorkersKVStoreSingle`
 
 WorkersKVStoreSingle is created as a singleton object. This is because the Module Worker syntax only use environment variables at the time of request.
@@ -140,24 +159,13 @@ This is implemented `KeyStorer` interface.
 - `cacheKey` specifies the key of the public key cache.
 - `cfKVNamespace` specifies the KV namespace which is bound your workers.
 
-### `createSessionCookie(idToken: string, sessionCookieOptions: SessionCookieOptions, env?: EmulatorEnv): Promise<string>`
+### `AdminAuthApiClient.getOrInitialize(projectId: string, credential: Credential, retryConfig?: RetryConfig): AdminAuthApiClient`
 
-Creates a new Firebase session cookie with the specified options. The created JWT string can be set as a server-side session cookie with a custom cookie policy, and be used for session management. The session cookie JWT will have the same payload claims as the provided ID token. See [Manage Session Cookies](https://firebase.google.com/docs/auth/admin/manage-cookies) for code samples and detailed documentation.
+AdminAuthApiClient is created as a singleton object. This is because the Module Worker syntax only use environment variables at the time of request.
 
-- `idToken` The Firebase ID token to exchange for a session cookie.
-- `sessionCookieOptions` The session cookie options which includes custom session duration.
-- `env` is an optional parameter. but this is using to detect should use emulator or not.
+You can send request with the [Admin Auth API](https://cloud.google.com/identity-platform/docs/reference/rest). To generate an access token, you will use the `Credential` class. For instance, if you want to generate an access token from a Service Account JSON, you need to specify `ServiceAccountCredential` as a parameter during initialization.
 
-**Required** service acccount credential to use this API. You need to set the credentials with `Auth.getOrInitialize`.
-
-### `verifySessionCookie(sessionCookie: string, env?: EmulatorEnv): Promise<FirebaseIdToken>`
-
-Verifies a Firebase session cookie. Returns a Promise with the cookie claims. Rejects the promise if the cookie could not be verified.
-
-See [Verify Session Cookies](https://firebase.google.com/docs/auth/admin/manage-cookies#verify_session_cookie_and_check_permissions) for code samples and detailed documentation.
-
-- `sessionCookie` The session cookie to verify.
-- `env` is an optional parameter. but this is using to detect should use emulator or not.
+By specifying the [`roles/firebaseauth.admin`](https://firebase.google.com/docs/projects/iam/roles-predefined-product#app-distro) role to the Service Account, it becomes available for use. If you want finer control over permissions, create a Custom Role based on the [Access Control](https://cloud.google.com/identity-platform/docs/access-control) guide and assign it to the Service Account.
 
 ### `emulatorHost(env?: EmulatorEnv): string | undefined`
 
