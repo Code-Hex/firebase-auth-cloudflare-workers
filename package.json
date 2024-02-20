@@ -1,6 +1,6 @@
 {
   "name": "firebase-auth-cloudflare-workers",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "Zero-dependencies firebase auth library for Cloudflare Workers.",
   "author": "codehex",
   "license": "MIT",
@@ -25,7 +25,8 @@
     "lint": "eslint --ext .ts .",
     "lint-fix": "eslint --fix --ext .ts .",
     "prepublish": "run-p build:*",
-    "wrangler": "wrangler"
+    "wrangler": "wrangler",
+    "version": "pnpm run build && git add -A dist"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240208.0",
