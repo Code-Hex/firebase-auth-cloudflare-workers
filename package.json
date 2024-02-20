@@ -26,7 +26,7 @@
     "lint-fix": "eslint --fix --ext .ts .",
     "prepublish": "run-p build:*",
     "wrangler": "wrangler",
-    "version": "pnpm run build && git add -A dist"
+    "version": "pnpm run build && git add -A src/version.ts"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240208.0",
