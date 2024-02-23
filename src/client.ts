@@ -1,7 +1,8 @@
 import type { ApiSettings } from './api-requests';
 import type { Credential } from './credential';
 import { useEmulator, type EmulatorEnv } from './emulator';
-import { AppErrorCodes, FirebaseAppError } from './errors';
+import { AppErrorCodes, FirebaseAppError, FirebaseAuthError } from './errors';
+import { isNonNullObject } from './validator';
 import { version } from './version';
 
 /**
@@ -120,6 +121,19 @@ export class BaseClient {
         if (err.cause) {
           throw err.cause;
         }
+
+        try {
+          const json = JSON.parse(err.message);
+          const errorCode = this.getErrorCode(json);
+          if (errorCode) {
+            throw FirebaseAuthError.fromServerError(errorCode, json);
+          }
+        } catch (err) {
+          if (err instanceof FirebaseAuthError) {
+            throw err;
+          }
+        }
+
         throw new FirebaseAppError(
           AppErrorCodes.INTERNAL_ERROR,
           `Error while sending request or reading response: "${err}". Raw server ` +
@@ -129,6 +143,14 @@ export class BaseClient {
       }
       throw new FirebaseAppError(AppErrorCodes.NETWORK_ERROR, `Error while making request: ${String(err)}`);
     }
+  }
+
+  /**
+   * @param response - The response to check for errors.
+   * @returns The error code if present; null otherwise.
+   */
+  private getErrorCode(response: any): string | null {
+    return (isNonNullObject(response) && response.error && response.error.message) || null;
   }
 
   private waitForRetry(delayMillis: number): Promise<void> {
