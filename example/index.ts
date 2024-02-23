@@ -2,7 +2,7 @@ import { Hono } from 'hono';
 import { getCookie, setCookie } from 'hono/cookie';
 import { csrf } from 'hono/csrf';
 import { html } from 'hono/html';
-import { Auth, EmulatorCredential, emulatorHost, WorkersKVStoreSingle } from '../src';
+import { Auth, ServiceAccountCredential, emulatorHost, WorkersKVStoreSingle, AdminAuthApiClient } from '../src';
 
 type Env = {
   EMAIL_ADDRESS: string;
@@ -12,6 +12,9 @@ type Env = {
   PUBLIC_JWK_CACHE_KEY: string;
 
   FIREBASE_AUTH_EMULATOR_HOST: string; // satisfied EmulatorEnv
+  // Set JSON as string.
+  // See: https://cloud.google.com/iam/docs/keys-create-delete
+  SERVICE_ACCOUNT_JSON: string;
 };
 
 const app = new Hono<{ Bindings: Env }>();
@@ -46,7 +49,7 @@ app.post('/verify-header', async c => {
     c.env.PROJECT_ID,
     WorkersKVStoreSingle.getOrInitialize(c.env.PUBLIC_JWK_CACHE_KEY, c.env.PUBLIC_JWK_CACHE_KV)
   );
-  const firebaseToken = await auth.verifyIdToken(jwt, c.env);
+  const firebaseToken = await auth.verifyIdToken(jwt, false, c.env);
 
   return new Response(JSON.stringify(firebaseToken), {
     headers: {
@@ -153,16 +156,13 @@ app.post('/admin/login_session', async c => {
   // The session cookie will have the same claims as the ID token.
   // To only allow session cookie setting on recent sign-in, auth_time in ID token
   // can be checked to ensure user was recently signed in before creating a session cookie.
-  const auth = Auth.getOrInitialize(
+  const auth = AdminAuthApiClient.getOrInitialize(
     c.env.PROJECT_ID,
-    WorkersKVStoreSingle.getOrInitialize(c.env.PUBLIC_JWK_CACHE_KEY, c.env.PUBLIC_JWK_CACHE_KV),
-    new EmulatorCredential() // You MUST use ServiceAccountCredential in real world
+    new ServiceAccountCredential(c.env.SERVICE_ACCOUNT_JSON)
   );
   const sessionCookie = await auth.createSessionCookie(
     idToken,
-    {
-      expiresIn,
-    },
+    expiresIn,
     c.env // This valus must be removed in real world
   );
   setCookie(c, 'session', sessionCookie, {
@@ -178,13 +178,13 @@ app.get('/admin/profile', async c => {
 
   const auth = Auth.getOrInitialize(
     c.env.PROJECT_ID,
-    WorkersKVStoreSingle.getOrInitialize(c.env.PUBLIC_JWK_CACHE_KEY, c.env.PUBLIC_JWK_CACHE_KV),
-    new EmulatorCredential() // You MUST use ServiceAccountCredential in real world
+    WorkersKVStoreSingle.getOrInitialize(c.env.PUBLIC_JWK_CACHE_KEY, c.env.PUBLIC_JWK_CACHE_KV)
   );
 
   try {
     const decodedToken = await auth.verifySessionCookie(
       session,
+      false,
       c.env // This valus must be removed in real world
     );
     return c.json(decodedToken);

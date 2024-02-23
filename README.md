@@ -120,22 +120,24 @@ Auth is created as a singleton object. This is because the Module Worker syntax 
 
 See official document for project ID: https://firebase.google.com/docs/projects/learn-more#project-identifiers
 
-### `authObj.verifyIdToken(idToken: string, env?: EmulatorEnv): Promise<FirebaseIdToken>`
+### `authObj.verifyIdToken(idToken: string, checkRevoked?: boolean, env?: EmulatorEnv): Promise<FirebaseIdToken>`
 
 Verifies a Firebase ID token (JWT). If the token is valid, the promise is fulfilled with the token's decoded claims; otherwise, the promise is rejected.
 
 See the [ID Token section of the OpenID Connect spec](http://openid.net/specs/openid-connect-core-1_0.html#IDToken) for more information about the specific properties below.
 
 - `idToken` The ID token to verify.
+- `checkRevoked` -  Whether to check if the session cookie was revoked. This requires an extra request to the Firebase Auth backend to check the `tokensValidAfterTime` time for the corresponding user. When not specified, this additional check is not performed.
 - `env` is an optional parameter. but this is using to detect should use emulator or not.
 
-### `authObj.verifySessionCookie(sessionCookie: string, env?: EmulatorEnv): Promise<FirebaseIdToken>`
+### `authObj.verifySessionCookie(sessionCookie: string, checkRevoked?: boolean, env?: EmulatorEnv): Promise<FirebaseIdToken>`
 
 Verifies a Firebase session cookie. Returns a Promise with the cookie claims. Rejects the promise if the cookie could not be verified.
 
 See [Verify Session Cookies](https://firebase.google.com/docs/auth/admin/manage-cookies#verify_session_cookie_and_check_permissions) for code samples and detailed documentation.
 
 - `sessionCookie` The session cookie to verify.
+- `checkRevoked` -  Whether to check if the session cookie was revoked. This requires an extra request to the Firebase Auth backend to check the `tokensValidAfterTime` time for the corresponding user. When not specified, this additional check is not performed.
 - `env` is an optional parameter. but this is using to detect should use emulator or not.
 
 ### `authObj.createSessionCookie(idToken: string, sessionCookieOptions: SessionCookieOptions, env?: EmulatorEnv): Promise<string>`
@@ -147,6 +149,28 @@ Creates a new Firebase session cookie with the specified options. The created JW
 - `env` is an optional parameter. but this is using to detect should use emulator or not.
 
 **Required** service acccount credential to use this API. You need to set the credentials with `Auth.getOrInitialize`.
+
+### `authObj.getUser(uid: string, env?: EmulatorEnv): Promise<UserRecord>`
+
+Gets the user data for the user corresponding to a given `uid`.
+
+- `uid` corresponding to the user whose data to fetch.
+- `env` is an optional parameter. but this is using to detect should use emulator or not.
+
+### `authObj.revokeRefreshTokens(uid: string, env?: EmulatorEnv): Promise<void>`
+
+Revokes all refresh tokens for an existing user.
+
+-  `uid` corresponding to the user whose refresh tokens are to be revoked.
+- `env` is an optional parameter. but this is using to detect should use emulator or not.
+
+### `authObj.setCustomUserClaims(uid: string, customUserClaims: object | null, env?: EmulatorEnv): Promise<void>`
+
+Sets additional developer claims on an existing user identified by the provided `uid`, typically used to define user roles and levels of access. These claims should propagate to all devices where the user is already signed in (after token expiration or when token refresh is forced) and the next time the user signs in. If a reserved OIDC claim name is used (sub, iat, iss, etc), an error is thrown. They are set on the authenticated user's ID token JWT.
+
+- `uid` - The `uid` of the user to edit.
+- `customUserClaims` The developer claims to set. If null is passed, existing custom claims are deleted. Passing a custom claims payload larger than 1000 bytes will throw an error. Custom claims are added to the user's ID token which is transmitted on every authenticated request. For profile non-access related user attributes, use database or other separate storage systems.
+- `env` is an optional parameter. but this is using to detect should use emulator or not.
 
 ### `WorkersKVStoreSingle.getOrInitialize(cacheKey: string, cfKVNamespace: KVNamespace): WorkersKVStoreSingle`
 
@@ -236,4 +260,4 @@ Access to `/admin/login` after started up Emulator and created an account (email
 
 ### Required service account key.
 
-- [ ] Check authorized user is deleted (revoked)
+- [x] Check authorized user is deleted (revoked)

@@ -91,3 +91,13 @@ export function isObject(value: any): boolean {
 export function isNonNullObject<T>(value: T | null | undefined): value is T {
   return isObject(value) && value !== null;
 }
+
+/**
+ * Validates that a string is a valid Firebase Auth uid.
+ *
+ * @param uid - The string to validate.
+ * @returns Whether the string is a valid Firebase Auth uid.
+ */
+export function isUid(uid: any): boolean {
+  return typeof uid === 'string' && uid.length > 0 && uid.length <= 128;
+}
