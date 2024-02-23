@@ -154,12 +154,71 @@ export class BaseAuth {
    * for code samples and detailed documentation.
    *
    * @param uid - The `uid` corresponding to the user whose data to fetch.
+   * @param env - An optional parameter specifying the environment in which the function is running.
+   *   If the function is running in an emulator environment, this should be set to `EmulatorEnv`.
+   *   If not specified, the function will assume it is running in a production environment.
    *
    * @returns A promise fulfilled with the user
    *   data corresponding to the provided `uid`.
    */
   public async getUser(uid: string, env?: EmulatorEnv): Promise<UserRecord> {
     return await this.authApiClient.getAccountInfoByUid(uid, env);
+  }
+
+  /**
+   * Revokes all refresh tokens for an existing user.
+   *
+   * This API will update the user's {@link UserRecord.tokensValidAfterTime} to
+   * the current UTC. It is important that the server on which this is called has
+   * its clock set correctly and synchronized.
+   *
+   * While this will revoke all sessions for a specified user and disable any
+   * new ID tokens for existing sessions from getting minted, existing ID tokens
+   * may remain active until their natural expiration (one hour). To verify that
+   * ID tokens are revoked, use {@link BaseAuth.verifyIdToken}
+   * where `checkRevoked` is set to true.
+   *
+   * @param uid - The `uid` corresponding to the user whose refresh tokens
+   *   are to be revoked.
+   * @param env - An optional parameter specifying the environment in which the function is running.
+   *   If the function is running in an emulator environment, this should be set to `EmulatorEnv`.
+   *   If not specified, the function will assume it is running in a production environment.
+   *
+   * @returns An empty promise fulfilled once the user's refresh
+   *   tokens have been revoked.
+   */
+  public async revokeRefreshTokens(uid: string, env?: EmulatorEnv): Promise<void> {
+    await this.authApiClient.revokeRefreshTokens(uid, env);
+  }
+
+  /**
+   * Sets additional developer claims on an existing user identified by the
+   * provided `uid`, typically used to define user roles and levels of
+   * access. These claims should propagate to all devices where the user is
+   * already signed in (after token expiration or when token refresh is forced)
+   * and the next time the user signs in. If a reserved OIDC claim name
+   * is used (sub, iat, iss, etc), an error is thrown. They are set on the
+   * authenticated user's ID token JWT.
+   *
+   * See {@link https://firebase.google.com/docs/auth/admin/custom-claims |
+   * Defining user roles and access levels}
+   * for code samples and detailed documentation.
+   *
+   * @param uid - The `uid` of the user to edit.
+   * @param customUserClaims - The developer claims to set. If null is
+   *   passed, existing custom claims are deleted. Passing a custom claims payload
+   *   larger than 1000 bytes will throw an error. Custom claims are added to the
+   *   user's ID token which is transmitted on every authenticated request.
+   *   For profile non-access related user attributes, use database or other
+   *   separate storage systems.
+   * @param env - An optional parameter specifying the environment in which the function is running.
+   *   If the function is running in an emulator environment, this should be set to `EmulatorEnv`.
+   *   If not specified, the function will assume it is running in a production environment.
+   * @returns A promise that resolves when the operation completes
+   *   successfully.
+   */
+  public async setCustomUserClaims(uid: string, customUserClaims: object | null, env?: EmulatorEnv): Promise<void> {
+    await this.authApiClient.setCustomUserClaims(uid, customUserClaims, env);
   }
 
   /**
@@ -195,56 +254,6 @@ export class BaseAuth {
     }
     // All checks above passed. Return the decoded token.
     return decodedIdToken;
-  }
-
-  /**
-   * Revokes all refresh tokens for an existing user.
-   *
-   * This API will update the user's {@link UserRecord.tokensValidAfterTime} to
-   * the current UTC. It is important that the server on which this is called has
-   * its clock set correctly and synchronized.
-   *
-   * While this will revoke all sessions for a specified user and disable any
-   * new ID tokens for existing sessions from getting minted, existing ID tokens
-   * may remain active until their natural expiration (one hour). To verify that
-   * ID tokens are revoked, use {@link BaseAuth.verifyIdToken}
-   * where `checkRevoked` is set to true.
-   *
-   * @param uid - The `uid` corresponding to the user whose refresh tokens
-   *   are to be revoked.
-   *
-   * @returns An empty promise fulfilled once the user's refresh
-   *   tokens have been revoked.
-   */
-  public async revokeRefreshTokens(uid: string, env?: EmulatorEnv): Promise<void> {
-    await this.authApiClient.revokeRefreshTokens(uid, env);
-  }
-
-  /**
-   * Sets additional developer claims on an existing user identified by the
-   * provided `uid`, typically used to define user roles and levels of
-   * access. These claims should propagate to all devices where the user is
-   * already signed in (after token expiration or when token refresh is forced)
-   * and the next time the user signs in. If a reserved OIDC claim name
-   * is used (sub, iat, iss, etc), an error is thrown. They are set on the
-   * authenticated user's ID token JWT.
-   *
-   * See {@link https://firebase.google.com/docs/auth/admin/custom-claims |
-   * Defining user roles and access levels}
-   * for code samples and detailed documentation.
-   *
-   * @param uid - The `uid` of the user to edit.
-   * @param customUserClaims - The developer claims to set. If null is
-   *   passed, existing custom claims are deleted. Passing a custom claims payload
-   *   larger than 1000 bytes will throw an error. Custom claims are added to the
-   *   user's ID token which is transmitted on every authenticated request.
-   *   For profile non-access related user attributes, use database or other
-   *   separate storage systems.
-   * @returns A promise that resolves when the operation completes
-   *   successfully.
-   */
-  public async setCustomUserClaims(uid: string, customUserClaims: object | null, env?: EmulatorEnv): Promise<void> {
-    await this.authApiClient.setCustomUserClaims(uid, customUserClaims, env);
   }
 }
 
