@@ -63,7 +63,7 @@ export class BaseAuth {
     const isEmulator = useEmulator(env);
     const decodedIdToken = await this.idTokenVerifier.verifyJWT(idToken, isEmulator);
     // Whether to check if the token was revoked.
-    if (checkRevoked || isEmulator) {
+    if (checkRevoked) {
       return await this.verifyDecodedJWTNotRevokedOrDisabled(decodedIdToken, AuthClientErrorCode.ID_TOKEN_REVOKED, env);
     }
     return decodedIdToken;
@@ -137,7 +137,7 @@ export class BaseAuth {
     const isEmulator = useEmulator(env);
     const decodedIdToken = await this.sessionCookieVerifier.verifyJWT(sessionCookie, isEmulator);
     // Whether to check if the token was revoked.
-    if (checkRevoked || isEmulator) {
+    if (checkRevoked) {
       return await this.verifyDecodedJWTNotRevokedOrDisabled(
         decodedIdToken,
         AuthClientErrorCode.SESSION_COOKIE_REVOKED,
