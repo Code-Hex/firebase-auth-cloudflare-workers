@@ -35,7 +35,7 @@ export class Auth extends BaseAuth {
 }
 
 export class WorkersKVStoreSingle extends WorkersKVStore {
-  private static instance?: WorkersKVStoreSingle;
+  private static instance?: Map<string, WorkersKVStoreSingle>;
 
   private constructor(cacheKey: string, cfKVNamespace: KVNamespace) {
     super(cacheKey, cfKVNamespace);
@@ -43,9 +43,15 @@ export class WorkersKVStoreSingle extends WorkersKVStore {
 
   static getOrInitialize(cacheKey: string, cfKVNamespace: KVNamespace): WorkersKVStoreSingle {
     if (!WorkersKVStoreSingle.instance) {
-      WorkersKVStoreSingle.instance = new WorkersKVStoreSingle(cacheKey, cfKVNamespace);
+      WorkersKVStoreSingle.instance = new Map<string, WorkersKVStoreSingle>();
     }
-    return WorkersKVStoreSingle.instance;
+    const instance = WorkersKVStoreSingle.instance.get(cacheKey);
+    if (instance) {
+      return instance;
+    }
+    const newInstance = new WorkersKVStoreSingle(cacheKey, cfKVNamespace);
+    WorkersKVStoreSingle.instance.set(cacheKey, newInstance);
+    return newInstance;
   }
 }
 
