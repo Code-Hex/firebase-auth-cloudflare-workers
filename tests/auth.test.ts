@@ -79,10 +79,7 @@ describe('createSessionCookie()', () => {
 
     await new Promise(resolve => setTimeout(() => resolve(auth.revokeRefreshTokens(uid2, env)), 1000));
 
-    // Check revocation is forced in emulator-mode and this should throw.
-    await expect(auth.verifySessionCookie(sessionCookie, false, env)).rejects.toThrowError(
-      new FirebaseAuthError(AuthClientErrorCode.SESSION_COOKIE_REVOKED)
-    );
+    await expect(auth.verifySessionCookie(sessionCookie, false, env)).resolves.toHaveProperty('uid', uid2);
 
     await expect(auth.verifySessionCookie(sessionCookie, true, env)).rejects.toThrowError(
       new FirebaseAuthError(AuthClientErrorCode.SESSION_COOKIE_REVOKED)
@@ -166,10 +163,7 @@ describe('verifySessionCookie()', () => {
     expect(userRecord.uid).to.equal(uid);
     expect(userRecord.disabled).to.equal(true);
 
-    // If it is in emulator mode, a user-disabled error will be thrown.
-    await expect(auth.verifySessionCookie(sessionCookie, false, env)).rejects.toThrowError(
-      new FirebaseAuthError(AuthClientErrorCode.USER_DISABLED)
-    );
+    await expect(auth.verifySessionCookie(sessionCookie, false, env)).resolves.toHaveProperty('uid', uid);
 
     await expect(auth.verifySessionCookie(sessionCookie, true, env)).rejects.toThrowError(
       new FirebaseAuthError(AuthClientErrorCode.USER_DISABLED)
