@@ -11,6 +11,7 @@ export type { KeyStorer };
 export type { EmulatorEnv } from './emulator';
 export type { FirebaseIdToken } from './token-verifier';
 export type { RetryConfig };
+export * from './errors';
 
 export class Auth extends BaseAuth {
   private static instance?: Auth;
