@@ -242,7 +242,7 @@ export class FirebaseTokenVerifier {
   }
 
   private async decodeAndVerify(token: string, isEmulator: boolean): Promise<FirebaseIdToken> {
-    const currentTimestamp = Math.floor(Date.now() / 1000);
+    const currentTimestamp = Math.ceil(Date.now() / 1000);
     try {
       const rs256Token = this.safeDecode(token, isEmulator, currentTimestamp);
       const { payload } = rs256Token.decodedToken;
