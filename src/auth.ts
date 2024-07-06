@@ -54,14 +54,15 @@ export class BaseAuth {
    * @param env - An optional parameter specifying the environment in which the function is running.
    *   If the function is running in an emulator environment, this should be set to `EmulatorEnv`.
    *   If not specified, the function will assume it is running in a production environment.
-   *
+   * @param clockSkewSeconds - The number of seconds to tolerate when checking the `iat`.
+   *   This is to deal with small clock differences among different servers.
    * @returns A promise fulfilled with the
    *   token's decoded claims if the ID token is valid; otherwise, a rejected
    *   promise.
    */
-  public async verifyIdToken(idToken: string, checkRevoked = false, env?: EmulatorEnv): Promise<FirebaseIdToken> {
+  public async verifyIdToken(idToken: string, checkRevoked = false, env?: EmulatorEnv, clockSkewSeconds?: number): Promise<FirebaseIdToken> {
     const isEmulator = useEmulator(env);
-    const decodedIdToken = await this.idTokenVerifier.verifyJWT(idToken, isEmulator);
+    const decodedIdToken = await this.idTokenVerifier.verifyJWT(idToken, isEmulator, clockSkewSeconds);
     // Whether to check if the token was revoked.
     if (checkRevoked) {
       return await this.verifyDecodedJWTNotRevokedOrDisabled(decodedIdToken, AuthClientErrorCode.ID_TOKEN_REVOKED, env);
