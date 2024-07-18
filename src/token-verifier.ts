@@ -229,7 +229,7 @@ export class FirebaseTokenVerifier {
    * @param clockSkewSeconds - The number of seconds to tolerate when checking the token's iat. Must be between 0-60, and an integer. Defualts to 0.
    * @returns A promise fulfilled with the decoded claims of the Firebase Auth ID token.
    */
-  public verifyJWT(jwtToken: string, isEmulator = false, clockSkewSeconds: number = 0): Promise<FirebaseIdToken> {
+  public verifyJWT(jwtToken: string, isEmulator = false, clockSkewSeconds: number = 5): Promise<FirebaseIdToken> {
     if (!isString(jwtToken)) {
       throw new FirebaseAuthError(
         AuthClientErrorCode.INVALID_ARGUMENT,
@@ -243,13 +243,13 @@ export class FirebaseTokenVerifier {
         'clockSkewSeconds must be an integer between 0 and 60.'
       )
     }
-    return this.decodeAndVerify(jwtToken, isEmulator, 0).then(payload => {
+    return this.decodeAndVerify(jwtToken, isEmulator, clockSkewSeconds).then(payload => {
       payload.uid = payload.sub;
       return payload;
     });
   }
 
-  private async decodeAndVerify(token: string, isEmulator: boolean, clockSkewSeconds: number = 0): Promise<FirebaseIdToken> {
+  private async decodeAndVerify(token: string, isEmulator: boolean, clockSkewSeconds: number = 5): Promise<FirebaseIdToken> {
     const currentTimestamp = Math.floor(Date.now() / 1000) + clockSkewSeconds;
     try {
       const rs256Token = this.safeDecode(token, isEmulator, currentTimestamp);
