@@ -1,27 +1,22 @@
+import crypto from 'node:crypto';
 import type { JsonWebKeyWithKid } from './jwt-decoder';
 import type { KeyStorer } from './key-store';
-import { isNonNullObject, isObject, isURL } from './validator';
+import { isNonNullObject, isURL } from './validator';
 
 export interface KeyFetcher {
   fetchPublicKeys(): Promise<Array<JsonWebKeyWithKid>>;
 }
 
-interface JWKMetadata {
-  keys: Array<JsonWebKeyWithKid>;
-}
-
-export const isJWKMetadata = (value: any): value is JWKMetadata => {
-  if (!isNonNullObject(value) || !value.keys) {
+export const isX509Certificates = (value: any): value is Record<string, string> => {
+  if (!isNonNullObject(value)) {
     return false;
   }
-  const keys = value.keys;
-  if (!Array.isArray(keys)) {
-    return false;
+  for (const v of Object.values(value)) {
+    if (typeof v !== 'string') {
+      return false;
+    }
   }
-  const filtered = keys.filter(
-    (key): key is JsonWebKeyWithKid => isObject(key) && !!key.kid && typeof key.kid === 'string'
-  );
-  return keys.length === filtered.length;
+  return true;
 };
 
 /**
@@ -54,9 +49,24 @@ export class UrlKeyFetcher implements KeyFetcher {
       throw new Error(errorMessage + text);
     }
 
+    function x509ToJwk(pem: string, kid: string) {
+      const cert = new crypto.X509Certificate(pem);
+      const publicKeyPem = cert.publicKey.export({ type: 'spki', format: 'pem' });
+      const publicKey = crypto.createPublicKey(publicKeyPem);
+      const jwkWithKid: JsonWebKeyWithKid = {
+        kid,
+        ...publicKey.export({ format: 'jwk' }),
+      };
+      return jwkWithKid;
+    }
+
     const publicKeys = await resp.json();
-    if (!isJWKMetadata(publicKeys)) {
+    if (!isX509Certificates(publicKeys)) {
       throw new Error(`The public keys are not an object or null: "${publicKeys}`);
+    }
+    const jwks: JsonWebKeyWithKid[] = [];
+    for (const [kid, pem] of Object.entries(publicKeys)) {
+      jwks.push(x509ToJwk(pem, kid));
     }
 
     const cacheControlHeader = resp.headers.get('cache-control');
@@ -64,10 +74,10 @@ export class UrlKeyFetcher implements KeyFetcher {
     // store the public keys cache in the KV store.
     const maxAge = parseMaxAge(cacheControlHeader);
     if (!isNaN(maxAge) && maxAge > 0) {
-      await this.keyStorer.put(JSON.stringify(publicKeys.keys), maxAge);
+      await this.keyStorer.put(JSON.stringify(jwks), maxAge);
     }
 
-    return publicKeys.keys;
+    return jwks;
   }
 }
 
