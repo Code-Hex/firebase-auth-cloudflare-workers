@@ -49,13 +49,22 @@ export class UrlKeyFetcher implements KeyFetcher {
       throw new Error(errorMessage + text);
     }
 
-    function x509ToJwk(pem: string, kid: string) {
+    async function x509ToJwk(pem: string, kid: string) {
       const cert = new crypto.X509Certificate(pem);
-      const publicKeyPem = cert.publicKey.export({ type: 'spki', format: 'pem' });
-      const publicKey = crypto.createPublicKey(publicKeyPem);
+      const cryptoKey = await crypto.subtle.importKey(
+        'spki',
+        cert.publicKey.export({ type: 'spki', format: 'der' }),
+        {
+          name: 'RSASSA-PKCS1-v1_5',
+          hash: 'SHA-256',
+        },
+        true,
+        ['verify']
+      );
+      const jwk = await crypto.subtle.exportKey('jwk', cryptoKey);
       const jwkWithKid: JsonWebKeyWithKid = {
         kid,
-        ...publicKey.export({ format: 'jwk' }),
+        ...jwk,
       };
       return jwkWithKid;
     }
@@ -66,7 +75,7 @@ export class UrlKeyFetcher implements KeyFetcher {
     }
     const jwks: JsonWebKeyWithKid[] = [];
     for (const [kid, pem] of Object.entries(publicKeys)) {
-      jwks.push(x509ToJwk(pem, kid));
+      jwks.push(await x509ToJwk(pem, kid));
     }
 
     const cacheControlHeader = resp.headers.get('cache-control');

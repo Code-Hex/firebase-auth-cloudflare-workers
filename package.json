@@ -1,6 +1,6 @@
 {
   "name": "firebase-auth-cloudflare-workers-x509",
-  "version": "2.0.4",
+  "version": "2.0.7",
   "description": "Zero-dependencies firebase auth library for Cloudflare Workers.",
   "author": "codehex",
   "maintainers": [
@@ -8,6 +8,10 @@
     "MIERUNE Inc. <info@mierune.co.jp>"
   ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/MIERUNE/firebase-auth-cloudflare-workers-x509"
+  },
   "main": "dist/main/index.js",
   "typings": "dist/main/index.d.ts",
   "module": "dist/module/index.js",
