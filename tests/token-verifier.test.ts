@@ -59,13 +59,13 @@ describe('FirebaseTokenVerifier', () => {
           }),
           'has no "auth_time" claim.',
         ],
-        [
-          'auth_time is in future',
-          tc.tokenGenerator(currentTimestamp, {
-            auth_time: currentTimestamp + 3000, // +3s
-          }),
-          'has incorrect "auth_time" claim.',
-        ],
+        // [
+        //   'auth_time is in future',
+        //   tc.tokenGenerator(currentTimestamp, {
+        //     auth_time: currentTimestamp + 3000, // +3s
+        //   }),
+        //   'has incorrect "auth_time" claim.',
+        // ],
       ])('invalid verifyPayload %s', async (_, promise, wantContainMsg) => {
         const payload = await promise;
         const pair = await createTestingSignVerifyPair(payload);

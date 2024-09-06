@@ -247,7 +247,7 @@ export class FirebaseTokenVerifier {
       const rs256Token = this.safeDecode(token, isEmulator, currentTimestamp);
       const { payload } = rs256Token.decodedToken;
 
-      this.verifyPayload(payload, currentTimestamp);
+      this.verifyPayload(payload);
       await this.verifySignature(rs256Token, isEmulator);
 
       return payload;
@@ -275,10 +275,7 @@ export class FirebaseTokenVerifier {
     }
   }
 
-  private verifyPayload(
-    tokenPayload: DecodedPayload,
-    currentTimestamp: number
-  ): asserts tokenPayload is FirebaseIdToken {
+  private verifyPayload(tokenPayload: DecodedPayload): asserts tokenPayload is FirebaseIdToken {
     const payload = tokenPayload;
 
     const projectIdMatchMessage =
@@ -320,11 +317,11 @@ export class FirebaseTokenVerifier {
       throw createInvalidArgument(`${this.tokenInfo.jwtName} has no "auth_time" claim. ` + verifyJwtTokenDocsMessage);
     }
 
-    if (currentTimestamp < payload.auth_time) {
-      throw createInvalidArgument(
-        `${this.tokenInfo.jwtName} has incorrect "auth_time" claim. ` + verifyJwtTokenDocsMessage
-      );
-    }
+    // if (currentTimestamp < payload.auth_time) {
+    //   throw createInvalidArgument(
+    //     `${this.tokenInfo.jwtName} has incorrect "auth_time" claim. ` + verifyJwtTokenDocsMessage
+    //   );
+    // }
   }
 
   private async verifySignature(token: RS256Token, isEmulator: boolean): Promise<void> {
@@ -364,7 +361,7 @@ export class FirebaseTokenVerifier {
 
 // URL containing the public keys for the Google certs (whose private keys are used to sign Firebase
 // Auth ID tokens)
-const CLIENT_JWK_URL = 'https://www.googleapis.com/robot/v1/metadata/jwk/securetoken@system.gserviceaccount.com';
+const CLIENT_JWK_URL = 'https://www.googleapis.com/robot/v1/metadata/x509/securetoken@system.gserviceaccount.com';
 
 /**
  * Interface that defines token related user facing information.
@@ -420,7 +417,7 @@ export function baseCreateIdTokenVerifier(
 }
 
 // URL containing the public keys for Firebase session cookies.
-const SESSION_COOKIE_CERT_URL = 'https://identitytoolkit.googleapis.com/v1/sessionCookiePublicKeys';
+const SESSION_COOKIE_CERT_URL = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/publicKeys';
 
 /**
  * User facing token information related to the Firebase session cookie.

@@ -1,4 +1,17 @@
-# firebase-auth-cloudflare-workers
+# firebase-auth-cloudflare-workers-x509
+
+Fork of <https://github.com/Code-Hex/firebase-auth-cloudflare-workers>
+
+- Use X.509 certificate endpoints instead of JWK endpoints, since the JWT endpoint sets `no-cache` on the public key response for the session cookie.
+- Remove the checks that verify `iat` and `auth_time` are not in the future, as the original firebase-admin doesn’t perform these checks and they can cause issues due to slight clock skew.
+
+Since it uses `crypto.X509Certificate`, You need to add the nodejs_compat_v2 compatibility flag to your wrangler.toml file:
+
+```toml
+compatibility_flags = ["nodejs_compat"]
+```
+
+---
 
 **Zero-dependencies** firebase auth library for Cloudflare Workers.
 

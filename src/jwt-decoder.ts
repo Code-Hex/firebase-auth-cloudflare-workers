@@ -99,12 +99,12 @@ const decodePayload = (payloadPart: string, currentTimestamp: number): DecodedPa
     throw new JwtError(JwtErrorCode.INVALID_ARGUMENT, `"iat" claim must be a number but got "${payload.iat}"`);
   }
 
-  if (currentTimestamp < payload.iat) {
-    throw new JwtError(
-      JwtErrorCode.INVALID_ARGUMENT,
-      `Incorrect "iat" claim must be a older than "${currentTimestamp}" (iat: "${payload.iat}")`
-    );
-  }
+  // if (currentTimestamp < payload.iat) {
+  //   throw new JwtError(
+  //     JwtErrorCode.INVALID_ARGUMENT,
+  //     `Incorrect "iat" claim must be a older than "${currentTimestamp}" (iat: "${payload.iat}")`
+  //   );
+  // }
 
   if (!isNumber(payload.exp)) {
     throw new JwtError(JwtErrorCode.INVALID_ARGUMENT, `"exp" claim must be a number but got "${payload.exp}"`);

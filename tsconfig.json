@@ -15,6 +15,7 @@
     "noUnusedParameters": true,
     "resolveJsonModule": true,
     "types": [
+      "node",
       "@cloudflare/workers-types"
     ],
   },

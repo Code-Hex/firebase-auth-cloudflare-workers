@@ -78,17 +78,17 @@ describe('TokenDecoder', () => {
         },
         new JwtError(JwtErrorCode.INVALID_ARGUMENT, '"iss" claim must be a string but got ""'),
       ],
-      [
-        'iat is in future',
-        {
-          ...payload,
-          iat: currentTimestamp + 10000, // +10s
-        },
-        new JwtError(
-          JwtErrorCode.INVALID_ARGUMENT,
-          `Incorrect "iat" claim must be a older than "${currentTimestamp}" (iat: "${currentTimestamp + 10000}")`
-        ),
-      ],
+      // [
+      //   'iat is in future',
+      //   {
+      //     ...payload,
+      //     iat: currentTimestamp + 10000, // +10s
+      //   },
+      //   new JwtError(
+      //     JwtErrorCode.INVALID_ARGUMENT,
+      //     `Incorrect "iat" claim must be a older than "${currentTimestamp}" (iat: "${currentTimestamp + 10000}")`
+      //   ),
+      // ],
       [
         'exp is in past',
         {
