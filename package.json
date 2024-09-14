@@ -1,8 +1,8 @@
 {
   "name": "firebase-auth-cloudflare-workers-x509",
-  "version": "2.0.7",
-  "description": "Zero-dependencies firebase auth library for Cloudflare Workers.",
-  "author": "codehex",
+  "version": "2.0.8",
+  "description": "Firebase auth library for Cloudflare Workers (forked from firebase-auth-cloudflare-workers and modified to use X.509 certificates)",
+  "author": "ciscorn",
   "maintainers": [
     "Taku Fukada <naninunenor@gmail.com>",
     "MIERUNE Inc. <info@mierune.co.jp>"
@@ -35,6 +35,9 @@
     "prepublish": "run-p build:*",
     "wrangler": "wrangler",
     "version": "pnpm run build && git add -A src/version.ts"
+  },
+  "dependencies": {
+    "pkijs": "^3.2.4"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240208.0",

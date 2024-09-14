@@ -32,12 +32,18 @@ const wantValidArray = [
     kty: 'RSA',
     n: 'vGgO_3_YMkqYyLgErdj0u-ceS_hgHBHXW3W4uD7TZhNy1P7c-jzUOEyzYEjk9sM5jW8uN6rBm3Ff6iYYbmVq18JQa2ezc125AWKxFNVTfTPRVL_hvzWODY-eqkWMRBuavGyMSxSJDAEWBvnvwfr7z_kTT2MkhMs-mnnT1oXYBvYVnUzWCOgEea46RsI2hK7AvyJohqfP2JPeSzIfpl5PRINprHqO6lZLj3HLBv7Rlg-vEieDGsXPP_lKAMu00Ke0--3jW2EAnV0jMKXFo8f_ErHPEdV0OH9CBs82ckgtr_TbZY2UQdNEI3wicOU7o7wppWNQesooUbMCnzb260Z6fw',
     e: 'AQAB',
+    alg: 'RS256',
+    ext: true,
+    key_ops: ['verify'],
   },
   {
     kid: '02100716fdd904e5b4d49116ff5dbdfc98999401',
     kty: 'RSA',
     n: 'tSDGEtwzyjmcTXOdN4gk23nC6MXHtmJfdBYwylMPbtlHaUjzIjZVPMFWrW5OnLKuw2oKuizUckvu2DVtOEBdIxOpJKmMHj899ayeYTJQuqgdVvAHrFl9bw7PsoGsMFaSPqm84m3jOOUfzjiUXzV5XueTHRZEZ6rjXaSwnI3ehiIa0nymZAs5bh0w92vATMZq9WdqskD0dLh7_A6_Mqg6kTeeqD9bi_AjBlbFBs22w4faYU-IDZ_vFKER8Sg2VpIgyEnrBDPq7xJt0vEG8ROexwdyDccpdwInWwdctAJLmgCcGlQHndg-BRM8RoJUoY_StiRP_Tqdc-gN1oSHn6RWEw',
     e: 'AQAB',
+    alg: 'RS256',
+    ext: true,
+    key_ops: ['verify'],
   },
 ];
 

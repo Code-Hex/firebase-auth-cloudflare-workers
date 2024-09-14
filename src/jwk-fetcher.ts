@@ -1,4 +1,5 @@
-import crypto from 'node:crypto';
+import * as PKIjs from 'pkijs';
+
 import type { JsonWebKeyWithKid } from './jwt-decoder';
 import type { KeyStorer } from './key-store';
 import { isNonNullObject, isURL } from './validator';
@@ -50,10 +51,13 @@ export class UrlKeyFetcher implements KeyFetcher {
     }
 
     async function x509ToJwk(pem: string, kid: string) {
-      const cert = new crypto.X509Certificate(pem);
+      const base64 = pem.replace(/-----(BEGIN CERTIFICATE|END CERTIFICATE)-----/g, '').replace(/\s+/g, '');
+      const der = Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+      const cert = PKIjs.Certificate.fromBER(der);
+      const spki = cert.subjectPublicKeyInfo.toSchema().toBER();
       const cryptoKey = await crypto.subtle.importKey(
         'spki',
-        cert.publicKey.export({ type: 'spki', format: 'der' }),
+        spki,
         {
           name: 'RSASSA-PKCS1-v1_5',
           hash: 'SHA-256',
