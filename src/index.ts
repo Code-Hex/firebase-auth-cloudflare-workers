@@ -8,6 +8,7 @@ import { WorkersKVStore } from './key-store';
 export { type Credential, ServiceAccountCredential } from './credential';
 export { emulatorHost, useEmulator } from './emulator';
 export type { KeyStorer };
+export { InMemoryStore } from './key-store';
 export type { EmulatorEnv } from './emulator';
 export type { FirebaseIdToken } from './token-verifier';
 export type { RetryConfig };

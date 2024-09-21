@@ -4,7 +4,8 @@ import { BaseAuth } from '../src/auth';
 import { AuthApiClient } from '../src/auth-api-requests';
 import { AuthClientErrorCode, FirebaseAuthError } from '../src/errors';
 import type { UserRecord } from '../src/user-record';
-import type { EmulatorEnv, KeyStorer } from './../src/index';
+import { InMemoryStore } from './../src/index';
+import type { EmulatorEnv } from './../src/index';
 import {
   EmulatedSigner,
   FirebaseTokenGenerator,
@@ -34,7 +35,7 @@ describe('createSessionCookie()', () => {
 
   const signer = new EmulatedSigner();
   const tokenGenerator = new FirebaseTokenGenerator(signer);
-  const keyStorer = new InMemoryKeyStorer('cache-key');
+  const keyStorer = new InMemoryStore();
 
   it('creates a valid Firebase session cookie', async () => {
     const auth = new BaseAuth(projectId, keyStorer, new NopCredential());
@@ -128,7 +129,7 @@ describe('createSessionCookie()', () => {
 
 describe('verifySessionCookie()', () => {
   const uid = sessionCookieUids[0];
-  const keyStorer = new InMemoryKeyStorer('cache-key');
+  const keyStorer = new InMemoryStore();
   const auth = new BaseAuth(projectId, keyStorer, new NopCredential());
   const signer = new EmulatedSigner();
   const tokenGenerator = new FirebaseTokenGenerator(signer);
@@ -177,7 +178,7 @@ describe('getUser()', () => {
     admin: true,
     groupId: '1234',
   };
-  const keyStorer = new InMemoryKeyStorer('cache-key');
+  const keyStorer = new InMemoryStore();
   const auth = new BaseAuth(projectId, keyStorer, new NopCredential());
   const signer = new EmulatedSigner();
   const tokenGenerator = new FirebaseTokenGenerator(signer);
@@ -229,25 +230,6 @@ function generateRandomString(stringLength: number) {
     randomString += randomValues[i].toString(36)[0];
   }
   return randomString;
-}
-
-class InMemoryKeyStorer implements KeyStorer {
-  private store: Map<string, unknown> = new Map();
-  private timerId: NodeJS.Timeout | null = null;
-
-  constructor(private readonly cacheKey: string) {}
-
-  public async get<ExpectedValue = unknown>(): Promise<ExpectedValue | null> {
-    return (this.store.get(this.cacheKey) as ExpectedValue) || null;
-  }
-
-  public async put(value: string, expirationTtl: number): Promise<void> {
-    if (this.timerId) {
-      clearTimeout(this.timerId);
-    }
-    this.store.set(this.cacheKey, value);
-    this.timerId = setTimeout(() => this.store.delete(this.cacheKey), expirationTtl * 1000);
-  }
 }
 
 const FIREBASE_AUTH_DISABLE_USER = new ApiSettings('v1', '/accounts:update', 'POST')

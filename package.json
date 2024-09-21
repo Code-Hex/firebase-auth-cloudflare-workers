@@ -1,6 +1,6 @@
 {
   "name": "firebase-auth-cloudflare-workers-x509",
-  "version": "2.0.8",
+  "version": "2.0.9",
   "description": "Firebase auth library for Cloudflare Workers (forked from firebase-auth-cloudflare-workers and modified to use X.509 certificates)",
   "author": "ciscorn",
   "maintainers": [
