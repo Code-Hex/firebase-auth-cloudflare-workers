@@ -1,7 +1,7 @@
 import { JwtError, JwtErrorCode } from './errors';
 import type { KeyFetcher } from './jwk-fetcher';
 import { HTTPFetcher, UrlKeyFetcher } from './jwk-fetcher';
-import type { JsonWebKeyWithKid, RS256Token } from './jwt-decoder';
+import type { RS256Token } from './jwt-decoder';
 import type { KeyStorer } from './key-store';
 import { isNonNullObject } from './validator';
 

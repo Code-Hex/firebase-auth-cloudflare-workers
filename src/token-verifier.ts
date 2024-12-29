@@ -432,7 +432,7 @@ export function baseCreateIdTokenVerifier(
 }
 
 // URL containing the public keys for Firebase session cookies.
-const SESSION_COOKIE_CERT_URL = 'https://identitytoolkit.googleapis.com/v1/sessionCookiePublicKeys';
+const SESSION_COOKIE_CERT_URL = 'https://www.googleapis.com/identitytoolkit/v3/relyingparty/publicKeys';
 
 /**
  * User facing token information related to the Firebase session cookie.

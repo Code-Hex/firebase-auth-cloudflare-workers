@@ -1,7 +1,7 @@
 import { Miniflare } from 'miniflare';
 import { describe, it, expect, vi } from 'vitest';
 import type { Fetcher } from '../src/jwk-fetcher';
-import { isJWKMetadata, parseMaxAge, UrlKeyFetcher } from '../src/jwk-fetcher';
+import { isJWKMetadata, isX509Certificates, parseMaxAge, UrlKeyFetcher } from '../src/jwk-fetcher';
 import { WorkersKVStore } from '../src/key-store';
 
 class HTTPMockFetcher implements Fetcher {
@@ -203,5 +203,54 @@ describe('isJWKMetadata', () => {
 
   it('returns false if only some keys have a kid property that is a string', () => {
     expect(isJWKMetadata({ keys: [{ kid: 'string' }, {}] })).toBe(false);
+  });
+});
+
+describe('isX509Certificates', () => {
+  it('should return true for valid X509 certificates', () => {
+    const validX509 = {
+      cert1: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz6',
+      cert2: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz7',
+    };
+    expect(isX509Certificates(validX509)).toBe(true);
+  });
+
+  it('should return false for null', () => {
+    expect(isX509Certificates(null)).toBe(false);
+  });
+
+  it('should return false for undefined', () => {
+    expect(isX509Certificates(undefined)).toBe(false);
+  });
+
+  it('should return false for non-object', () => {
+    expect(isX509Certificates('string')).toBe(false);
+    expect(isX509Certificates(123)).toBe(false);
+    expect(isX509Certificates(true)).toBe(false);
+  });
+
+  it('should return false for object with non-string values', () => {
+    const invalidX509 = {
+      cert1: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz6',
+      cert2: 123,
+    };
+    expect(isX509Certificates(invalidX509)).toBe(false);
+  });
+
+  it('should return false for object with empty values', () => {
+    const invalidX509 = {
+      cert1: '',
+      cert2: '',
+    };
+    expect(isX509Certificates(invalidX509)).toBe(false);
+  });
+
+  it('should return false for object with mixed valid and invalid values', () => {
+    const invalidX509 = {
+      cert1: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz6',
+      cert2: 123,
+      cert3: 'MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAz7',
+    };
+    expect(isX509Certificates(invalidX509)).toBe(false);
   });
 });

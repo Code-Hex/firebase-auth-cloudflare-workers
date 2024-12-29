@@ -1,6 +1,6 @@
-import type { JsonWebKeyWithKid } from './jwt-decoder';
 import type { KeyStorer } from './key-store';
 import { isNonNullObject, isObject, isURL } from './validator';
+import { jwkFromX509 } from './x509';
 
 export interface KeyFetcher {
   fetchPublicKeys(): Promise<Array<JsonWebKeyWithKid>>;
@@ -22,6 +22,22 @@ export const isJWKMetadata = (value: any): value is JWKMetadata => {
     (key): key is JsonWebKeyWithKid => isObject(key) && !!key.kid && typeof key.kid === 'string'
   );
   return keys.length === filtered.length;
+};
+
+export const isX509Certificates = (value: any): value is Record<string, string> => {
+  if (!isNonNullObject(value)) {
+    return false;
+  }
+  const values = Object.values(value);
+  if (values.length === 0) {
+    return false;
+  }
+  for (const v of values) {
+    if (typeof v !== 'string' || v === '') {
+      return false;
+    }
+  }
+  return true;
 };
 
 /**
@@ -54,20 +70,32 @@ export class UrlKeyFetcher implements KeyFetcher {
       throw new Error(errorMessage + text);
     }
 
-    const publicKeys = await resp.json();
-    if (!isJWKMetadata(publicKeys)) {
-      throw new Error(`The public keys are not an object or null: "${publicKeys}`);
-    }
+    const json = await resp.json();
+    const publicKeys = await this.retrievePublicKeys(json);
 
     const cacheControlHeader = resp.headers.get('cache-control');
 
     // store the public keys cache in the KV store.
     const maxAge = parseMaxAge(cacheControlHeader);
     if (!isNaN(maxAge) && maxAge > 0) {
-      await this.keyStorer.put(JSON.stringify(publicKeys.keys), maxAge);
+      await this.keyStorer.put(JSON.stringify(publicKeys), maxAge);
     }
 
-    return publicKeys.keys;
+    return publicKeys;
+  }
+
+  private async retrievePublicKeys(json: unknown): Promise<Array<JsonWebKeyWithKid>> {
+    if (isX509Certificates(json)) {
+      const jwks: JsonWebKeyWithKid[] = [];
+      for (const [kid, x509] of Object.entries(json)) {
+        jwks.push(await jwkFromX509(kid, x509));
+      }
+      return jwks;
+    }
+    if (!isJWKMetadata(json)) {
+      throw new Error(`The public keys are not an object or null: "${json}`);
+    }
+    return json.keys;
   }
 }
 
