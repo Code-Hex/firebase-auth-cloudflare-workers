@@ -7,10 +7,6 @@ export interface TokenDecoder {
   decode(token: string): Promise<RS256Token>;
 }
 
-export interface JsonWebKeyWithKid extends JsonWebKey {
-  kid: string;
-}
-
 export type DecodedHeader = { kid: string; alg: 'RS256' } & Record<string, any>;
 
 export type DecodedPayload = {

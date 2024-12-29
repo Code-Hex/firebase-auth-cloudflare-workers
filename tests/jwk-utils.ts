@@ -1,8 +1,9 @@
 import { encodeBase64Url, encodeObjectBase64Url } from '../src/base64';
 import type { KeyFetcher } from '../src/jwk-fetcher';
 import { rs256alg } from '../src/jws-verifier';
-import type { DecodedHeader, DecodedPayload, JsonWebKeyWithKid } from '../src/jwt-decoder';
+import type { DecodedHeader, DecodedPayload } from '../src/jwt-decoder';
 import { utf8Encoder } from '../src/utf8';
+import type { JsonWebKeyWithKid } from '@cloudflare/workers-types';
 
 export class TestingKeyFetcher implements KeyFetcher {
   constructor(
