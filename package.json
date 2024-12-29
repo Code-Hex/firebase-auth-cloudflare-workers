@@ -1,6 +1,6 @@
 {
   "name": "firebase-auth-cloudflare-workers",
-  "version": "2.0.5",
+  "version": "2.0.6",
   "description": "Zero-dependencies firebase auth library for Cloudflare Workers.",
   "author": "codehex",
   "license": "MIT",
