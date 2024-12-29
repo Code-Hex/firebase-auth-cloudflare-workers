@@ -127,7 +127,7 @@ describe('UrlKeyFetcher', () => {
     const TEST_NAMESPACE = await mf.getKVNamespace('TEST_NAMESPACE');
     const urlKeyFetcher = new UrlKeyFetcher(mockedFetcher, new WorkersKVStore(cacheKey, TEST_NAMESPACE));
 
-    expect(() => urlKeyFetcher.fetchPublicKeys()).rejects.toThrowError(
+    await expect(() => urlKeyFetcher.fetchPublicKeys()).rejects.toThrowError(
       'Error fetching public keys for Google certs: ' + internalServerMsg
     );
   });
@@ -142,7 +142,9 @@ describe('UrlKeyFetcher', () => {
     const TEST_NAMESPACE = await mf.getKVNamespace('TEST_NAMESPACE');
     const urlKeyFetcher = new UrlKeyFetcher(mockedFetcher, new WorkersKVStore(cacheKey, TEST_NAMESPACE));
 
-    expect(() => urlKeyFetcher.fetchPublicKeys()).rejects.toThrowError('The public keys are not an object or null:');
+    await expect(() => urlKeyFetcher.fetchPublicKeys()).rejects.toThrowError(
+      'The public keys are not an object or null:'
+    );
   });
 });
 
