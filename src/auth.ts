@@ -60,7 +60,12 @@ export class BaseAuth {
    *   token's decoded claims if the ID token is valid; otherwise, a rejected
    *   promise.
    */
-  public async verifyIdToken(idToken: string, checkRevoked = false, env?: EmulatorEnv, clockSkewSeconds?: number): Promise<FirebaseIdToken> {
+  public async verifyIdToken(
+    idToken: string,
+    checkRevoked = false,
+    env?: EmulatorEnv,
+    clockSkewSeconds?: number
+  ): Promise<FirebaseIdToken> {
     const isEmulator = useEmulator(env);
     const decodedIdToken = await this.idTokenVerifier.verifyJWT(idToken, isEmulator, clockSkewSeconds);
     // Whether to check if the token was revoked.
