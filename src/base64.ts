@@ -27,4 +27,4 @@ export const decodeBase64 = (str: string): Uint8Array => {
 };
 
 const jsonUTF8Stringify = (obj: any): Uint8Array => utf8Encoder.encode(JSON.stringify(obj));
-export const encodeObjectBase64Url = (obj: any): string => encodeBase64Url(jsonUTF8Stringify(obj));
+export const encodeObjectBase64Url = (obj: any): string => encodeBase64Url(jsonUTF8Stringify(obj).buffer);
