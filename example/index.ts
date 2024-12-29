@@ -72,7 +72,7 @@ app.get('/admin/login', async c => {
       <script type="module">
         // See https://firebase.google.com/docs/auth/admin/manage-cookies
         //
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-app.js';
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-app.js';
         import $ from 'https://cdn.skypack.dev/jquery';
         // Add Firebase products that you want to use
         import {
@@ -83,7 +83,7 @@ app.get('/admin/login', async c => {
           signOut,
           setPersistence,
           inMemoryPersistence,
-        } from 'https://www.gstatic.com/firebasejs/10.5.0/firebase-auth.js';
+        } from 'https://www.gstatic.com/firebasejs/11.0.2/firebase-auth.js';
         const app = initializeApp({
           apiKey: 'test1234',
           authDomain: 'test',
@@ -151,7 +151,7 @@ app.post('/admin/login_session', async c => {
     return c.json({ message: 'invalid idToken' }, 400);
   }
   // Set session expiration to 5 days.
-  const expiresIn = 60 * 60 * 24 * 5 * 1000;
+  const expiresIn = 60 * 60 * 24 * 5;
   // Create the session cookie. This will also verify the ID token in the process.
   // The session cookie will have the same claims as the ID token.
   // To only allow session cookie setting on recent sign-in, auth_time in ID token
