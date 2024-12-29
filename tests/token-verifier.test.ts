@@ -70,7 +70,7 @@ describe('FirebaseTokenVerifier', () => {
         const payload = await promise;
         const pair = await createTestingSignVerifyPair(payload);
         const ftv = tc.firebaseTokenVerifier(pair.verifier, projectId);
-        expect(() => ftv.verifyJWT(pair.jwt, false)).rejects.toThrowError(wantContainMsg);
+        await expect(() => ftv.verifyJWT(pair.jwt, false)).rejects.toThrowError(wantContainMsg);
       });
 
       it('valid with firebase emulator', async () => {
