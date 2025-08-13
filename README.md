@@ -31,7 +31,7 @@ const verifyJWT = async (req: Request, env: Bindings): Promise<Response> => {
     env.PROJECT_ID,
     WorkersKVStoreSingle.getOrInitialize(env.PUBLIC_JWK_CACHE_KEY, env.PUBLIC_JWK_CACHE_KV)
   )
-  const firebaseToken = await auth.verifyIdToken(jwt, env)
+  const firebaseToken = await auth.verifyIdToken(jwt, false, env)
 
   return new Response(JSON.stringify(firebaseToken), {
     headers: {
